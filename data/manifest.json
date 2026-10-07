@@ -1,22 +1,23 @@
 {
-  "generated_at": "2026-10-07T17:06:41+00:00",
+  "generated_at": "2026-10-07T20:40:30+00:00",
   "sample": false,
   "sample_countries": [],
   "source": "OpenStreetMap (extract Geofabrik .osm.pbf)",
   "attribution": "© OpenStreetMap contributors",
   "license": "ODbL",
   "countries": [
-    "ES"
+    "ES",
+    "PT"
   ],
   "counts": {
     "dams": 3751,
     "dam_geoms": 3750,
-    "reservoirs": 72625,
+    "reservoirs": 43931,
     "weirs": 6462,
     "plants": 424,
     "substations": 277,
-    "power_lines": 7916,
-    "conduits": 9064,
+    "power_lines": 7899,
+    "conduits": 9062,
     "bairros": 0
   },
   "layers": {
@@ -56,6 +57,28 @@
       "bairros.geojson"
     ]
   },
-  "total_features": 104269,
+  "counts_by_country": {
+    "ES": {
+      "dams": 3010,
+      "dam_geoms": 3009,
+      "reservoirs": 42675,
+      "weirs": 4090,
+      "plants": 195,
+      "substations": 79,
+      "power_lines": 6340,
+      "conduits": 6546
+    },
+    "PT": {
+      "dams": 741,
+      "dam_geoms": 741,
+      "reservoirs": 1256,
+      "weirs": 2372,
+      "plants": 229,
+      "substations": 198,
+      "power_lines": 1559,
+      "conduits": 2516
+    }
+  },
+  "total_features": 75556,
   "notion_count": 0
 }
