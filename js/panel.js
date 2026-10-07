@@ -127,7 +127,7 @@ function buildLegend() {
 // Informação dos dados (rodapé)
 // ---------------------------------------------------------------------
 
-function renderDataInfo(manifest) {
+export function renderDataInfo(manifest) {
   if (!manifest) {
     dom.dataInfo.textContent = "Não foi possível ler data/manifest.json.";
     return;

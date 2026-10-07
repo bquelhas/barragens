@@ -413,3 +413,37 @@ export function isLoaded(key) {
 export function selectedDamId() {
   return state.selectedDam;
 }
+
+/** Atualiza a tabela do Notion (usada ao reanexar dados). */
+export function setNotion(notion) {
+  state.notion = notion || {};
+}
+
+/**
+ * Remove as nossas camadas/sources e recarrega os dados do disco.
+ * Usado quando o `manifest.json` muda (novos dados publicados).
+ */
+export async function reloadData() {
+  const map = state.map;
+  for (const def of LAYERS) {
+    for (const id of layerIdsByKey(def.key)) {
+      if (map.getLayer(id)) map.removeLayer(id);
+    }
+  }
+  if (map.getLayer("reservoirs-highlight")) map.removeLayer("reservoirs-highlight");
+
+  const srcIds = [damsSourceId, "src-res-highlight", ...LAYERS.map((d) => `src-${d.key}`)];
+  for (const id of srcIds) {
+    if (map.getSource(id)) map.removeSource(id);
+  }
+
+  state.loaded.clear();
+  state.data = {};
+  buildReservoirHighlight();
+
+  for (const def of LAYERS) {
+    if (state.visible[def.key]) await ensureLayer(def.key);
+  }
+  applyFilters(state.filters);
+  if (state.selectedDam) selectDam(state.selectedDam, state.selectedReservoir);
+}

@@ -13,6 +13,8 @@ const THEME_KEY = "barragens-theme";
 let map;
 let manifest = null;
 let notion = {};
+let lastGenerated = null;
+const REFRESH_MS = 60000; // verifica se há dados novos a cada minuto
 
 // ---------------------------------------------------------------------
 // Tema
@@ -79,6 +81,7 @@ async function boot() {
   ]);
   manifest = manifestData;
   notion = notionData || {};
+  lastGenerated = manifest?.generated_at || null;
 
   showSampleBanner(manifest);
 
@@ -133,8 +136,31 @@ async function onMapReady(initial) {
   // Estado inicial vindo do URL.
   if (initial.dam) openDamById(initial.dam, null);
 
+  // Verificação periódica de dados novos (a Action publica por país).
+  setInterval(checkForUpdates, REFRESH_MS);
+
   document.getElementById("loading").hidden = true;
   document.body.classList.add("ready");
+}
+
+/**
+ * Vê se a Action publicou dados novos e, em caso afirmativo, recarrega as
+ * camadas sem recarregar a página (mantém o zoom e a barragem selecionada).
+ */
+async function checkForUpdates() {
+  const fresh = await fetchJson(`${DATA.manifest}?t=${Date.now()}`, null);
+  if (!fresh || !fresh.generated_at || fresh.generated_at === lastGenerated) return;
+
+  lastGenerated = fresh.generated_at;
+  manifest = fresh;
+  notion = (await fetchJson(`${DATA.notion}?t=${Date.now()}`, {})) || {};
+
+  layers.setNotion(notion);
+  await layers.reloadData();
+  search.setData(layers.allDams(), layers.allReservoirs());
+  panel.renderDataInfo(manifest);
+  showSampleBanner(manifest);
+  console.info("[dados] atualizados para", fresh.generated_at);
 }
 
 // ---------------------------------------------------------------------
@@ -246,14 +272,32 @@ function flyTo(coords) {
 
 function showSampleBanner(manifest) {
   const banner = document.getElementById("sample-banner");
-  if (manifest && manifest.sample) {
-    banner.hidden = false;
-    // As alturas do mapa, do menu e do painel dependem de --banner-h.
-    requestAnimationFrame(() => {
-      document.documentElement.style.setProperty("--banner-h", `${banner.offsetHeight}px`);
-      if (map) map.resize();
-    });
+  const text = document.getElementById("sample-banner-text");
+  const sampleCountries = manifest?.sample_countries || [];
+  const isSample = !!(manifest && (manifest.sample || sampleCountries.length));
+
+  if (!isSample) {
+    banner.hidden = true;
+    document.documentElement.style.setProperty("--banner-h", "0px");
+    if (map) map.resize();
+    return;
   }
+
+  const all = sampleCountries.includes("PT") && sampleCountries.includes("ES");
+  if (!sampleCountries.length || all) {
+    text.innerHTML = "Estás a ver <strong>dados de amostra</strong> (poucas barragens). " +
+      "Corre o <code>scripts/build_data.py</code> ou a GitHub Action para carregar os dados reais do OpenStreetMap.";
+  } else {
+    text.innerHTML = `<strong>Dados de amostra</strong> para ${sampleCountries.join(" e ")}. ` +
+      "As restantes barragens já são dados reais do OpenStreetMap.";
+  }
+
+  banner.hidden = false;
+  // As alturas do mapa, do menu e do painel dependem de --banner-h.
+  requestAnimationFrame(() => {
+    document.documentElement.style.setProperty("--banner-h", `${banner.offsetHeight}px`);
+    if (map) map.resize();
+  });
 }
 
 boot();

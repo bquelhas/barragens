@@ -1,13 +1,21 @@
 name: Dados OSM (semanal)
 
-# Regenera os dados a partir do OpenStreetMap e faz commit em `data/`.
+# Extrai os dados do OpenStreetMap e faz commit em `data/`, país a país.
+# Cada país é commitado logo que termina, para o site ir mostrando os dados
+# à medida que ficam prontos (o site recarrega sozinho a cada minuto).
+#
 # Corre todas as segundas-feiras às 04:17 UTC; também pode ser lançado à mão
-# no separador "Actions" (Run workflow).
+# no separador "Actions" (Run workflow), escolhendo os países (ex.: "PT").
 
 on:
   schedule:
     - cron: "17 4 * * 1"
   workflow_dispatch:
+    inputs:
+      countries:
+        description: "Países a extrair (separados por vírgula)"
+        required: false
+        default: "PT,ES"
 
 # Evita duas execuções em simultâneo.
 concurrency:
@@ -33,19 +41,30 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
-      - name: Extrair dados (Overpass -> data/)
-        run: python scripts/build_data.py
-        # Se a extração falhar (ou tiver poucas barragens), o script sai com
-        # erro e nada é commitado — os dados bons anteriores mantêm-se.
-
-      - name: Commit e push dos dados
+      - name: Extrair (país a país) e commit
+        shell: bash
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          if git diff --cached --quiet; then
-            echo "Sem alterações nos dados."
-          else
-            git commit -m "dados: atualização OSM $(date -u +%Y-%m-%d)"
-            git push
-          fi
+
+          COUNTRIES="${{ github.event.inputs.countries }}"
+          if [ -z "$COUNTRIES" ]; then COUNTRIES="PT,ES"; fi
+
+          IFS=',' read -ra CC_LIST <<< "$COUNTRIES"
+          for cc in "${CC_LIST[@]}"; do
+            cc="$(echo "$cc" | tr -d ' ' | tr '[:lower:]' '[:upper:]')"
+            echo "========== Extração de $cc =========="
+            # Se a extração falhar (ou tiver poucas barragens), o script sai
+            # com erro e este país não é commitado — os dados bons mantêm-se.
+            python scripts/build_data.py --countries "$cc"
+
+            git add data/
+            if git diff --cached --quiet; then
+              echo "Sem alterações nos dados de $cc."
+            else
+              git commit -m "dados: extração $cc $(date -u +%Y-%m-%dT%H:%MZ)"
+              git push
+              echo "Commit de $cc publicado."
+            fi
+          done

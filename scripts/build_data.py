@@ -395,35 +395,76 @@ def simplify_and_round(geometry, layer: str):
 # Escrita dos dados
 # ---------------------------------------------------------------------------
 
-def write_layer(name: str, features: list[dict], manifest: dict, force_single: bool = False):
+# Todas as camadas que o manifest pode anunciar.
+LAYER_KEYS = ["dams", "reservoirs", "weirs", "plants",
+              "substations", "power_lines", "conduits", "bairros"]
+
+# Países processados na execução atual (definido em `run`).
+CURRENT_COUNTRIES: list[str] = []
+
+
+def write_layer(name: str, features: list[dict]):
     """
-    Escreve uma camada em `data/`. Divide por país se o ficheiro for grande.
+    Escreve uma camada em `data/`, dividida por país.
+
+    Cada país fica no seu ficheiro (`<camada>_<cc>.geojson`), para que uma
+    extração de um só país não toque nos dados do outro. Os ficheiros dos
+    países processados nesta execução são reescritos (ou removidos, se não
+    houver dados); os restantes ficam intactos.
     """
-    fc = {"type": "FeatureCollection", "features": features}
-    text = json.dumps(fc, ensure_ascii=False, separators=(",", ":"))
-    size = len(text.encode("utf-8"))
+    legacy = config.DATA_DIR / f"{name}.geojson"
+    if legacy.exists():
+        legacy.unlink()
+    for cc in CURRENT_COUNTRIES:
+        old = config.DATA_DIR / f"{name}_{cc.lower()}.geojson"
+        if old.exists():
+            old.unlink()
 
-    split = (not force_single) and size > config.SPLIT_THRESHOLD_BYTES and \
-        any(f["properties"].get("country") for f in features)
+    by_country: dict[str, list] = {}
+    for f in features:
+        cc = (f["properties"].get("country") or "xx").lower()
+        by_country.setdefault(cc, []).append(f)
 
-    files = []
-    if split:
-        by_country: dict[str, list] = {}
-        for f in features:
-            by_country.setdefault(f["properties"].get("country", "XX"), []).append(f)
-        for cc, feats in sorted(by_country.items()):
-            fname = f"{name}_{cc.lower()}.geojson"
-            write_geojson(config.DATA_DIR / fname, feats)
-            files.append(fname)
-    else:
-        fname = f"{name}.geojson"
-        write_geojson(config.DATA_DIR / fname, features)
-        files.append(fname)
+    if not by_country:
+        log(f"[saída] {name}: sem dados nos países {CURRENT_COUNTRIES}")
+        return
 
-    manifest["layers"][name] = files
-    manifest["counts"][name] = len(features)
-    log(f"[saída] {name}: {len(features)} features -> {', '.join(files)} "
-        f"({size/1024:.0f} KB)")
+    written = []
+    for cc, feats in sorted(by_country.items()):
+        fname = f"{name}_{cc}.geojson"
+        write_geojson(config.DATA_DIR / fname, feats)
+        written.append(f"{fname}({len(feats)})")
+    log(f"[saída] {name}: {', '.join(written)}")
+
+
+def rebuild_manifest(manifest: dict):
+    """
+    Reconstrói `layers`/`counts` a partir dos ficheiros que existem em `data/`.
+
+    Assim, uma extração de um só país preserva os ficheiros do outro país que
+    já estejam no repositório (comportamento de "merge").
+    """
+    layers: dict[str, list] = {}
+    counts: dict[str, int] = {}
+    for name in LAYER_KEYS:
+        files = sorted(p.name for p in config.DATA_DIR.glob(f"{name}_*.geojson"))
+        single = config.DATA_DIR / f"{name}.geojson"
+        if single.exists():
+            files = [single.name] + files
+        if not files:
+            continue
+        layers[name] = files
+        total = 0
+        for fn in files:
+            try:
+                with (config.DATA_DIR / fn).open(encoding="utf-8") as fh:
+                    total += len(json.load(fh).get("features", []))
+            except Exception as exc:  # noqa: BLE001
+                log(f"[aviso] não consegui ler {fn}: {exc}")
+        counts[name] = total
+    manifest["layers"] = layers
+    manifest["counts"] = counts
+    manifest["total_features"] = sum(counts.values())
 
 
 def write_geojson(path: Path, features: list[dict]):
@@ -437,9 +478,23 @@ def write_geojson(path: Path, features: list[dict]):
 # ---------------------------------------------------------------------------
 
 def run(countries: list[str], offline: bool, force: bool):
+    global CURRENT_COUNTRIES
+    CURRENT_COUNTRIES = countries
+    prev = read_previous_manifest()
+
+    # Países que ainda têm dados de amostra (mantido entre execuções).
+    sample_countries = set(prev.get("sample_countries") or []) if prev else set()
+    if prev and prev.get("sample") and not sample_countries:
+        sample_countries = {"PT", "ES"}
+    if offline:
+        sample_countries |= set(countries)
+    else:
+        sample_countries -= set(countries)
+
     manifest: dict = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "sample": offline,
+        "sample": bool(sample_countries),
+        "sample_countries": sorted(sample_countries),
         "source": "OpenStreetMap (via Overpass API)" if not offline else
                   "Amostra local (scripts/fixtures)",
         "attribution": "© OpenStreetMap contributors",
@@ -448,7 +503,8 @@ def run(countries: list[str], offline: bool, force: bool):
         "counts": {},
         "layers": {},
     }
-    log(f"[build] países={countries} offline={offline}")
+    log(f"[build] países={countries} offline={offline} "
+        f"amostra={sorted(sample_countries) or 'nenhuma'}")
 
     all_dams: list[dict] = []          # barragens já agrupadas
     all_reservoirs: list[dict] = []    # (osm_type, osm_id, tags, geom, country)
@@ -539,39 +595,30 @@ def run(countries: list[str], offline: bool, force: bool):
     all_lines = within_dams(all_lines, config.LINE_KEEP_M)
     all_conduits = within_dams(all_conduits, config.CONDUIT_KEEP_M)
 
-    # -- Validação mínima -------------------------------------------------
-    prev = read_previous_manifest()
-    new_count = len(all_dams)
-    if not force and prev and not prev.get("sample"):
-        prev_dams = prev.get("counts", {}).get("dams", 0)
-        if prev_dams and new_count < prev_dams * config.MIN_DAMS_RATIO:
-            raise SystemExit(
-                f"[validação] só {new_count} barragens (antes {prev_dams}). "
-                f"A abortar para não apagar dados bons. Usa --force para forçar."
-            )
-    log(f"[validação] barragens: {new_count} (anterior: "
-        f"{prev.get('counts', {}).get('dams', 'n/a') if prev else 'n/a'})")
-
-    # -- Escrever camadas -------------------------------------------------
+    # -- Escrever camadas (por país) -------------------------------------
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
-    write_dams(all_dams, manifest)
-    write_reservoirs(all_reservoirs, manifest)
-    write_simple(all_weirs, "weirs", "name", manifest)
-    write_simple(all_plants, "plants", "name", manifest, extra=attrs_power)
-    write_simple(all_substations, "substations", "name", manifest)
-    write_simple(all_lines, "power_lines", "name", manifest)
-    write_simple(all_conduits, "conduits", "name", manifest)
+    write_dams(all_dams)
+    write_reservoirs(all_reservoirs)
+    write_simple(all_weirs, "weirs", "name")
+    write_simple(all_plants, "plants", "name", extra=attrs_power)
+    write_simple(all_substations, "substations", "name")
+    write_simple(all_lines, "power_lines", "name")
+    write_simple(all_conduits, "conduits", "name")
 
-    # Camada da fase 2 (bairros barragistas): registada se o ficheiro existir.
-    bairros_file = config.DATA_DIR / "bairros.geojson"
-    if bairros_file.exists():
-        try:
-            with bairros_file.open(encoding="utf-8") as fh:
-                bairros = json.load(fh)
-            manifest["layers"]["bairros"] = ["bairros.geojson"]
-            manifest["counts"]["bairros"] = len(bairros.get("features", []))
-        except Exception as exc:  # noqa: BLE001
-            log(f"[aviso] não consegui ler bairros.geojson: {exc}")
+    # Reconstrói `layers`/`counts` a partir do disco (merge com o outro país).
+    rebuild_manifest(manifest)
+
+    # -- Validação mínima (após a escrita, antes do commit) ---------------
+    if not force and not offline and prev and not prev.get("sample"):
+        prev_dams = prev.get("counts", {}).get("dams", 0)
+        new_dams = manifest["counts"].get("dams", 0)
+        if prev_dams and new_dams < prev_dams * config.MIN_DAMS_RATIO:
+            raise SystemExit(
+                f"[validação] total de barragens {new_dams} < 80% de {prev_dams}. "
+                f"A abortar sem commit (os dados bons mantêm-se). Usa --force para forçar."
+            )
+    log(f"[validação] barragens: {manifest['counts'].get('dams', 0)} "
+        f"(anterior: {prev.get('counts', {}).get('dams', 'n/a') if prev else 'n/a'})")
 
     # -- Notion (se já existir) ------------------------------------------
     notion_file = config.DATA_DIR / "notion.json"
@@ -582,12 +629,11 @@ def run(countries: list[str], offline: bool, force: bool):
         except Exception:  # noqa: BLE001
             pass
 
-    manifest["total_features"] = sum(manifest["counts"].values())
     with (config.DATA_DIR / "manifest.json").open("w", encoding="utf-8") as fh:
         json.dump(manifest, fh, ensure_ascii=False, indent=2)
 
     log(f"[build] concluído: {manifest['total_features']} features no total")
-    log(f"[build] manifest -> data/manifest.json")
+    log("[build] manifest -> data/manifest.json")
 
 
 def attrs_power(tags: dict) -> dict:
@@ -614,7 +660,7 @@ def common_attrs(tags: dict) -> dict:
     }
 
 
-def write_dams(dams: list[dict], manifest: dict):
+def write_dams(dams: list[dict]):
     features = []
     for d in dams:
         tags = d["tags"]
@@ -637,10 +683,10 @@ def write_dams(dams: list[dict], manifest: dict):
         })
         features.append(feature_to_geojson(
             d, props, simplify_and_round(d["point"], "dams")))
-    write_layer("dams", features, manifest)
+    write_layer("dams", features)
 
 
-def write_reservoirs(reservoirs: list[dict], manifest: dict):
+def write_reservoirs(reservoirs: list[dict]):
     features = []
     for r in reservoirs:
         tags = r["tags"]
@@ -661,11 +707,10 @@ def write_reservoirs(reservoirs: list[dict], manifest: dict):
         }
         features.append(feature_to_geojson(
             r, props, simplify_and_round(r["geom"], "reservoirs")))
-    write_layer("reservoirs", features, manifest)
+    write_layer("reservoirs", features)
 
 
-def write_simple(feats: list[dict], layer: str, _name_field: str,
-                 manifest: dict, extra=None):
+def write_simple(feats: list[dict], layer: str, _name_field: str, extra=None):
     features = []
     for f in feats:
         tags = f["tags"]
@@ -682,7 +727,7 @@ def write_simple(feats: list[dict], layer: str, _name_field: str,
             props.update(extra(tags))
         features.append(feature_to_geojson(
             f, props, simplify_and_round(f["geom"], layer)))
-    write_layer(layer, features, manifest)
+    write_layer(layer, features)
 
 
 def read_previous_manifest() -> dict | None:
