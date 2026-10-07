@@ -154,6 +154,24 @@ def fetch_layer(country: str, layer: str, area_expr: str, area_label: str,
     else:
         query = ql_around(area_expr, filters, collect, plant_filters)
 
+    # Infraestruturas: as queries `around` sobre TODAS as barragens do país
+    # são demasiado pesadas para a Overpass pública (dão 502/504/timeout).
+    # Por isso vamos diretamente às subdivisões administrativas, onde o
+    # conjunto de barragens por distrito/comunidade é pequeno.
+    if collect is not None and not offline:
+        elements: list[dict] = []
+        for sub in overpass.discover_subareas(country, log):
+            try:
+                sub_query = ql_around(sub["area"], filters, collect, plant_filters)
+                data = overpass.overpass_query(
+                    sub_query, log, context=f"{country}/{layer} ({sub['name']})")
+                elements.extend(data.get("elements", []))
+                overpass.pause()
+            except overpass.OverpassError as exc:
+                log(f"[dados] falhou {country}/{layer} em {sub['name']}: {exc}")
+        log(f"[dados] {country}/{layer} (subáreas): {len(elements)} elementos")
+        return elements
+
     try:
         data = overpass.overpass_query(query, log, context=f"{country}/{layer} ({area_label})")
         elements = data.get("elements", [])

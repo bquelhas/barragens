@@ -39,8 +39,11 @@ USER_AGENT = (
 )
 
 # Timeout do lado do servidor Overpass (segundos) e do cliente HTTP.
+# Nota: algumas queries (ex.: todas as albufeiras de um país) demoram
+# vários minutos, por isso o timeout do servidor é generoso. O timeout do
+# cliente é o limite máximo de espera por resposta de um espelho.
 OVERPASS_TIMEOUT = 900
-HTTP_TIMEOUT = 1200
+HTTP_TIMEOUT = 600
 
 # Retries com backoff exponencial (segundos).
 MAX_RETRIES = 5

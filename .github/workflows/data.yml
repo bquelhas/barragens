@@ -64,6 +64,9 @@ jobs:
               echo "Sem alterações nos dados de $cc."
             else
               git commit -m "dados: extração $cc $(date -u +%Y-%m-%dT%H:%MZ)"
+              # Pode haver commits novos no remoto (ex.: outra execução ou
+              # edições manuais): integra antes de enviar.
+              git pull --rebase --autostash origin main
               git push
               echo "Commit de $cc publicado."
             fi
