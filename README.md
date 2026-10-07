@@ -1,4 +1,6 @@
-# Barragens de Portugal e Espanha 🗺️
+# Águas Represadas 🗺️
+
+**Barragens, albufeiras e o seu património — Portugal e Espanha.**
 
 Mapa interativo das **barragens**, **açudes**, **albufeiras** e
 **infraestruturas associadas** (centrais hidroelétricas, subestações, linhas
@@ -268,8 +270,11 @@ do Notion.)
 * **Associação espacial:** a ligação barragem↔albufeira↔central é feita por
   proximidade (200 m / 2 km / 3 km). Pode haver falsos positivos (sobretudo em
   vales com várias infraestruturas próximas).
-* **Filtros e agrupamento:** os filtros aplicam-se às barragens individuais;
-  os grupos ("bolhas") mostram sempre o total de barragens que contêm.
+* **Filtros e agrupamento:** os filtros aplicam-se às barragens individuais.
+  O **clustering** está disponível mas **desligado por defeito** (`CLUSTER.enabled`
+  em `js/config.js`): revelou-se pouco fiável (em testes, o worker não produzia
+  *tiles*). Em vez dele usamos colocação anti-colisão dos ícones + clique por
+  vizinhança, o que mantém o mapa limpo e clicável.
 * **Tamanho:** para Portugal + Espanha, alguns ficheiros podem ficar grandes.
   O pipeline divide automaticamente as camadas maiores por país e o site
   carrega as camadas pesadas só a partir de um certo zoom.
@@ -278,7 +283,34 @@ do Notion.)
 * **Notion:** só funciona com uma integração e a base de dados partilhada com
   ela; capas carregadas no Notion expiram (~1 h).
 
-## 10. Próximos passos sugeridos
+## 10. Interface e identidade (v2)
+
+* **Nome**: *Águas Represadas* (provisório, fácil de trocar em `PROJECT` em `js/config.js`).
+* **Tipografia**: *Fraunces* (títulos) + *Inter* (UI), via Google Fonts.
+* **Paleta** de betão/água/xisto/granito em tokens CSS (`:root`), com modo escuro.
+  Cores por uso escolhidas para contraste AA e distinção em deuteranopia.
+* **Mapa base**: relevo (hillshade) subtil — Terrain Tiles (AWS/Mapzen, CC-BY) —
+  e atenuação de POIs/estradas secundárias.
+* **Camadas/lista/recolhível**: botão **Camadas** (gaveta com abas “Camadas” e
+  “No mapa”); legenda compacta ao centro, só com as categorias ativas.
+* **Ficha**: capa (foto do Notion, com *fallback* gráfico na cor do uso), chips
+  (país/rio/uso), grelha de factos, botão **Ver no Notion**, secção **Contribuir**
+  (Copiar ID) e `<details>` de detalhes técnicos; destaca a albufeira e a
+  **rede elétrica relacionada** (a âmbar), esbatendo o resto da rede.
+* **Ícones de barragem** desenhados (um por uso), dimensionados pela altura ou
+  potência; anel dourado para quem tem página Notion.
+* **Boas-vindas** (primeira visita, reabrível com “?”): contadores por país e
+  destaques clicáveis.
+* **Telemóvel**: gaveta em ecrã inteiro, **ficha em bottom sheet** (3 posições),
+  pesquisa compacta, alvos de toque ≥ 44 px, `prefers-reduced-motion` respeitado.
+
+### Onde mudar
+
+* Nome/subtítulo, cores de uso, camadas, destaques e limiares: `js/config.js`.
+* Relevo (ligar/desligar, exagero): `HILLSHADE` em `js/config.js`.
+* Clustering: `CLUSTER.enabled` em `js/config.js`.
+
+## 11. Próximos passos sugeridos
 
 * Correr a extração real e verificar barragens sem nome/uso.
 * Preencher o Notion e ligar as primeiras barragens.
