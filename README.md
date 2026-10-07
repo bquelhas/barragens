@@ -265,6 +265,12 @@ do Notion.)
 
 ## 9. Limitações conhecidas
 
+* **Albufeiras**: filtrámos as pequenas/quiméricas (mantemos as ligadas a uma
+  barragem ou com área ≥ 5 ha, `MIN_RESERVOIR_AREA_HA`) e descartámos
+  **estruturas minúsculas sem nome** de barragem (< `MIN_DAM_SIZE_M`, 15 m),
+  tipicamente levadas e pequenos açudes sem interesse. Clicar numa albufeira
+  abre a **ficha da barragem associada** (ou um cartão de albufeira, se não
+  houver barragem).
 * **Qualidade do OSM:** o *tagging* é inconsistente. Algumas barragens não têm
   nome, uso, altura ou operador; algumas albufeiras usam etiquetas antigas.
 * **Associação espacial:** a ligação barragem↔albufeira↔central é feita por
