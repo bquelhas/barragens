@@ -242,6 +242,10 @@ function openDam(feature) {
     geometry: feature.geometry || { coordinates: [0, 0] },
   });
   layers.selectDam(p.dam_id, p.reservoir_id);
+  // Calcula e destaca a infraestrutura elétrica relacionada (assíncrono).
+  layers.highlightRelated(feature)
+    .then((rel) => panel.setRelated(rel))
+    .catch((err) => console.warn("Rede relacionada:", err));
   panel.closeSidebar();
   writeHash();
 }
@@ -253,6 +257,9 @@ async function openDamById(damId, coords) {
   if (dam) {
     panel.showDetail(dam);
     layers.selectDam(damId, dam.properties.reservoir_id);
+    layers.highlightRelated(dam)
+      .then((rel) => panel.setRelated(rel))
+      .catch((err) => console.warn("Rede relacionada:", err));
     const c = coords || dam.geometry.coordinates;
     flyTo(c);
   } else if (coords) {

@@ -223,6 +223,9 @@ export function showDetail(dam) {
     </div>
 
     ${notionBtn}
+    <div id="detail-related" class="related-box">
+      <span class="muted small">A procurar infraestrutura elétrica relacionada…</span>
+    </div>
     <div class="detail-links">${links.join("")}</div>
     <p class="muted small" style="margin-top:10px">
       Uso: ${escapeHtml(p.uso_fonte || "—")}
@@ -263,6 +266,25 @@ function fallbackCopy(text, done) {
 export function hideDetail() {
   dom.detail.classList.remove("open");
   dom.detail.hidden = true;
+}
+
+/** Preenche a caixa "Rede elétrica relacionada" do painel de detalhe. */
+export function setRelated(rel) {
+  const box = document.getElementById("detail-related");
+  if (!box) return;
+  if (!rel || (!rel.plantNames.length && !rel.nSubs && !rel.nLines)) {
+    box.innerHTML = '<span class="muted small">Sem infraestrutura elétrica associada no OSM.</span>';
+    return;
+  }
+  const parts = [];
+  const plantNames = [...new Set(rel.plantNames)].filter(Boolean);
+  if (plantNames.length) {
+    parts.push(`<strong>Centrais:</strong> ${plantNames.map(escapeHtml).join(", ")}`);
+  }
+  if (rel.nSubs) parts.push(`<strong>Subestações:</strong> ${rel.nSubs}`);
+  if (rel.nLines) parts.push(`<strong>Linhas elétricas:</strong> ${rel.nLines}`);
+  box.innerHTML = `<div class="related-title">⚡ Rede relacionada (a laranja no mapa)</div>` +
+    parts.map((s) => `<div class="small">${s}</div>`).join("");
 }
 
 // ---------------------------------------------------------------------

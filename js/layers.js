@@ -3,7 +3,7 @@
 // =====================================================================
 
 import { LAYERS, USO_COLORS, USO_ORDER, HIGHLIGHT, NOTION_COLOR, CLUSTER } from "./config.js";
-import { fetchJson } from "./utils.js";
+import { fetchJson, distanceM, distanceToGeometryM, pointOf } from "./utils.js";
 
 const state = {
   map: null,
@@ -27,6 +27,35 @@ export const damsSourceId = "src-dams";
 export function init(opts) {
   Object.assign(state, opts);
   buildReservoirHighlight();
+  buildRelatedHighlight();
+}
+
+/** Camada de destaque da infraestrutura relacionada (rede elétrica). */
+function buildRelatedHighlight() {
+  const map = state.map;
+  if (!map.getSource("src-related")) map.addSource("src-related", emptySource());
+  if (!map.getLayer("related-line")) {
+    map.addLayer({
+      id: "related-line", type: "line", source: "src-related", minzoom: 0,
+      paint: {
+        "line-color": HIGHLIGHT,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2, 12, 4],
+        "line-opacity": 0.95,
+      },
+    });
+  }
+  if (!map.getLayer("related-point")) {
+    map.addLayer({
+      id: "related-point", type: "circle", source: "src-related", minzoom: 0,
+      filter: ["==", ["geometry-type"], "Point"],
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 6, 14, 9],
+        "circle-color": HIGHLIGHT,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 2,
+      },
+    });
+  }
 }
 
 /** Prepara a camada de destaque da albufeira selecionada (sempre presente). */
@@ -134,6 +163,7 @@ export function rebuildAfterStyleChange() {
   const map = state.map;
   state.loaded.clear();
   buildReservoirHighlight();
+  buildRelatedHighlight();
   for (const def of LAYERS) {
     const key = def.key;
     if (!state.data[key]) continue;
@@ -392,8 +422,68 @@ export function selectDam(damId, reservoirId) {
   }
 }
 
+const RELATED_RADIUS = { line: 300, sub: 400 }; // metros
+
+/**
+ * Calcula e destaca a infraestrutura elétrica relacionada com a barragem:
+ * centrais associadas, linhas elétricas que lhes chegam e subestações
+ * nessas ligações — para se perceber o caminho da eletricidade.
+ */
+export async function highlightRelated(dam) {
+  const map = state.map;
+  const src = map.getSource("src-related");
+  if (!src) return null;
+  if (!dam) { src.setData(emptySource().data); return null; }
+
+  const p = dam.properties || {};
+  // Carrega os dados necessários (podem estar desligados no painel).
+  for (const k of ["plants", "substations", "power_lines"]) {
+    await ensureLayer(k);
+  }
+
+  const idOf = (f) => `${f.properties.osm_type}/${f.properties.osm_id}`;
+  const plants = state.data.plants || [];
+  const subs = state.data.substations || [];
+  const lines = state.data.power_lines || [];
+
+  // `plant_ids` chega como string JSON por via do MapLibre.
+  let plantIds = p.plant_ids;
+  if (typeof plantIds === "string") {
+    try { plantIds = JSON.parse(plantIds); } catch { plantIds = []; }
+  }
+  const ids = new Set(plantIds || []);
+
+  const relPlants = plants.filter((f) => ids.has(idOf(f)));
+  const plantPts = relPlants.map((f) => pointOf(f.geometry)).filter(Boolean);
+  const relLines = lines.filter((f) =>
+    plantPts.some((pt) => distanceToGeometryM(pt, f.geometry) <= RELATED_RADIUS.line));
+  const relSubs = subs.filter((f) => {
+    const c = pointOf(f.geometry);
+    if (!c) return false;
+    if (plantPts.some((pt) => distanceM(pt, c) <= RELATED_RADIUS.sub)) return true;
+    return relLines.some((l) => distanceToGeometryM(c, l.geometry) <= RELATED_RADIUS.sub);
+  });
+
+  const features = [...relPlants, ...relSubs, ...relLines].map((f) => ({
+    type: "Feature", geometry: f.geometry, properties: { osm: idOf(f) },
+  }));
+  src.setData({ type: "FeatureCollection", features });
+
+  return {
+    plantNames: relPlants.map((f) => f.properties.name).filter(Boolean),
+    nSubs: relSubs.length,
+    nLines: relLines.length,
+  };
+}
+
+export function clearRelated() {
+  const src = state.map?.getSource("src-related");
+  if (src) src.setData(emptySource().data);
+}
+
 export function clearSelection() {
   selectDam(null, null);
+  clearRelated();
 }
 
 // ---------------------------------------------------------------------
@@ -437,8 +527,12 @@ export async function reloadData() {
     }
   }
   if (map.getLayer("reservoirs-highlight")) map.removeLayer("reservoirs-highlight");
+  for (const id of ["related-line", "related-point"]) {
+    if (map.getLayer(id)) map.removeLayer(id);
+  }
 
-  const srcIds = [damsSourceId, "src-res-highlight", ...LAYERS.map((d) => `src-${d.key}`)];
+  const srcIds = [damsSourceId, "src-res-highlight", "src-related",
+                  ...LAYERS.map((d) => `src-${d.key}`)];
   for (const id of srcIds) {
     if (map.getSource(id)) map.removeSource(id);
   }
@@ -447,6 +541,7 @@ export async function reloadData() {
   state.loading = {};
   state.data = {};
   buildReservoirHighlight();
+  buildRelatedHighlight();
 
   for (const def of LAYERS) {
     if (state.visible[def.key]) await ensureLayer(def.key);

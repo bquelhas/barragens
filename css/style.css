@@ -383,6 +383,21 @@ fieldset.field { border: none; padding: 0; margin: 8px 6px; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Caixa de "rede relacionada" no painel de detalhe */
+.related-box {
+  margin: 12px 0 4px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-left: 4px solid #ff7a1a;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.related-box .related-title {
+  font-weight: 700;
+  font-size: .86rem;
+  margin-bottom: 4px;
+}
+
 /* Marca ★ para barragens com Notion (usada no mapa via camada símbolo) */
 
 /* --------------------------------------------------------- responsivo */
