@@ -19,6 +19,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # para poder disparar o workflow de publicação
 
 jobs:
   notion:
@@ -47,5 +48,13 @@ jobs:
             echo "Sem alterações no notion.json."
           else
             git commit -m "dados: atualização Notion $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase --autostash origin main
             git push
           fi
+
+      # O push com o GITHUB_TOKEN não dispara outros workflows; disparamos o Pages.
+      - name: Publicar no GitHub Pages
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --ref main

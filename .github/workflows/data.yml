@@ -27,6 +27,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # para poder disparar o workflow de publicação
 
 jobs:
   extrair:
@@ -78,3 +79,11 @@ jobs:
               echo "Commit de $cc publicado."
             fi
           done
+
+      # Os commits feitos com o GITHUB_TOKEN não disparam outros workflows,
+      # por isso disparamos o deploy do Pages explicitamente.
+      - name: Publicar no GitHub Pages
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --ref main
