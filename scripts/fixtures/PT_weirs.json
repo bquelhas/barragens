@@ -1,0 +1,29 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "node",
+      "id": 7001,
+      "lat": 40.2000,
+      "lon": -8.4300,
+      "tags": {
+        "waterway": "weir",
+        "name": "Açude de Coimbra",
+        "operator": "APA"
+      }
+    },
+    {
+      "type": "way",
+      "id": 7002,
+      "tags": {
+        "waterway": "weir",
+        "name": "Açude do Rio Alva"
+      },
+      "geometry": [
+        {"lat": 40.2900, "lon": -8.1200},
+        {"lat": 40.2910, "lon": -8.1180}
+      ]
+    }
+  ]
+}

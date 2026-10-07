@@ -1,0 +1,28 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "node",
+      "id": 4001,
+      "lat": 38.2050,
+      "lon": -7.5000,
+      "tags": {
+        "power": "substation",
+        "name": "Subestação de Alqueva",
+        "operator": "REN"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4002,
+      "lat": 39.5460,
+      "lon": -8.3130,
+      "tags": {
+        "power": "substation",
+        "name": "Subestação de Castelo de Bode",
+        "operator": "REN"
+      }
+    }
+  ]
+}

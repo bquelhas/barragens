@@ -1,0 +1,51 @@
+name: Dados OSM (semanal)
+
+# Regenera os dados a partir do OpenStreetMap e faz commit em `data/`.
+# Corre todas as segundas-feiras às 04:17 UTC; também pode ser lançado à mão
+# no separador "Actions" (Run workflow).
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+# Evita duas execuções em simultâneo.
+concurrency:
+  group: dados-osm
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  extrair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Extrair dados (Overpass -> data/)
+        run: python scripts/build_data.py
+        # Se a extração falhar (ou tiver poucas barragens), o script sai com
+        # erro e nada é commitado — os dados bons anteriores mantêm-se.
+
+      - name: Commit e push dos dados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "Sem alterações nos dados."
+          else
+            git commit -m "dados: atualização OSM $(date -u +%Y-%m-%d)"
+            git push
+          fi

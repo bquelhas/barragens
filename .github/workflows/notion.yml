@@ -1,0 +1,51 @@
+name: Dados Notion (a cada hora)
+
+# Atualiza apenas `data/notion.json` (links para as páginas do Notion),
+# independentemente da extração OSM. Corre de hora a hora e também à mão.
+#
+# Segredos necessários (Settings -> Secrets and variables -> Actions):
+#   NOTION_TOKEN         token da integração do Notion
+#   NOTION_DATABASE_ID   id da base de dados de barragens
+# Se não existirem, o script termina sem erro e o site fica sem links.
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: dados-notion
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  notion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Buscar Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: python scripts/fetch_notion.py
+
+      - name: Commit e push do notion.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/notion.json
+          if git diff --cached --quiet; then
+            echo "Sem alterações no notion.json."
+          else
+            git commit -m "dados: atualização Notion $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi

@@ -1,0 +1,141 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "way",
+      "id": 2001,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Albufeira de Castelo de Bode",
+        "usage": "hydro",
+        "operator": "EDP"
+      },
+      "geometry": [
+        {"lat": 39.5400, "lon": -8.3220},
+        {"lat": 39.5470, "lon": -8.3220},
+        {"lat": 39.5470, "lon": -8.3100},
+        {"lat": 39.5400, "lon": -8.3100},
+        {"lat": 39.5400, "lon": -8.3220}
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 2002,
+      "tags": {
+        "type": "multipolygon",
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Albufeira de Alqueva",
+        "usage": "irrigation",
+        "operator": "EDIA"
+      },
+      "members": [
+        {
+          "type": "way",
+          "ref": 2201,
+          "role": "outer",
+          "geometry": [
+            {"lat": 38.1000, "lon": -7.6000},
+            {"lat": 38.3000, "lon": -7.6000},
+            {"lat": 38.3000, "lon": -7.4000}
+          ]
+        },
+        {
+          "type": "way",
+          "ref": 2202,
+          "role": "outer",
+          "geometry": [
+            {"lat": 38.3000, "lon": -7.4000},
+            {"lat": 38.1000, "lon": -7.4000},
+            {"lat": 38.1000, "lon": -7.6000}
+          ]
+        },
+        {
+          "type": "way",
+          "ref": 2203,
+          "role": "inner",
+          "geometry": [
+            {"lat": 38.2200, "lon": -7.5200},
+            {"lat": 38.2300, "lon": -7.5200},
+            {"lat": 38.2300, "lon": -7.5100},
+            {"lat": 38.2200, "lon": -7.5100},
+            {"lat": 38.2200, "lon": -7.5200}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "way",
+      "id": 2003,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Albufeira da Aguieira",
+        "usage": "hydro",
+        "operator": "EDP"
+      },
+      "geometry": [
+        {"lat": 40.3200, "lon": -8.2500},
+        {"lat": 40.3700, "lon": -8.2500},
+        {"lat": 40.3700, "lon": -8.1800},
+        {"lat": 40.3200, "lon": -8.1800},
+        {"lat": 40.3200, "lon": -8.2500}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 2004,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Albufeira de Odeleite",
+        "usage": "water_supply",
+        "operator": "Águas do Algarve"
+      },
+      "geometry": [
+        {"lat": 37.3100, "lon": -7.4900},
+        {"lat": 37.3300, "lon": -7.4900},
+        {"lat": 37.3300, "lon": -7.4700},
+        {"lat": 37.3100, "lon": -7.4700},
+        {"lat": 37.3100, "lon": -7.4900}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 2005,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Albufeira do Alto Lindoso",
+        "usage": "hydro",
+        "operator": "EDP"
+      },
+      "geometry": [
+        {"lat": 41.8600, "lon": -8.2100},
+        {"lat": 41.8800, "lon": -8.2100},
+        {"lat": 41.8800, "lon": -8.1900},
+        {"lat": 41.8600, "lon": -8.1900},
+        {"lat": 41.8600, "lon": -8.2100}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 2006,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Albufeira do Caia",
+        "usage": "irrigation"
+      },
+      "geometry": [
+        {"lat": 38.8400, "lon": -7.0600},
+        {"lat": 38.8600, "lon": -7.0600},
+        {"lat": 38.8600, "lon": -7.0400},
+        {"lat": 38.8400, "lon": -7.0400},
+        {"lat": 38.8400, "lon": -7.0600}
+      ]
+    }
+  ]
+}

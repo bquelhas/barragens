@@ -1,0 +1,20 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "way",
+      "id": 5001,
+      "tags": {
+        "power": "line",
+        "voltage": "400000",
+        "name": "Linha Alqueva–Portimão (amostra)",
+        "operator": "REN"
+      },
+      "geometry": [
+        {"lat": 38.2100, "lon": -7.5200},
+        {"lat": 38.1900, "lon": -7.4800}
+      ]
+    }
+  ]
+}

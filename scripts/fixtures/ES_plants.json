@@ -1,0 +1,34 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "node",
+      "id": 9101,
+      "lat": 41.2410,
+      "lon": -6.6200,
+      "tags": {
+        "power": "generator",
+        "generator:source": "hydro",
+        "generator:method": "water-storage",
+        "generator:output:electricity": "1148 MW",
+        "name": "Central de Aldeadávila",
+        "operator": "Iberdrola"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9102,
+      "lat": 41.2960,
+      "lon": -6.3360,
+      "tags": {
+        "power": "generator",
+        "generator:source": "hydro",
+        "generator:method": "water-storage",
+        "generator:output:electricity": "810 MW",
+        "name": "Central de Almendra",
+        "operator": "Iberdrola"
+      }
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "way",
+      "id": 1001,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem de Castelo de Bode",
+        "name:en": "Castelo de Bode Dam",
+        "operator": "EDP",
+        "height": "115",
+        "start_date": "1951",
+        "wikidata": "Q964707",
+        "wikipedia": "pt:Barragem de Castelo de Bode",
+        "ref": "PT-DAM-1001"
+      },
+      "geometry": [
+        {"lat": 39.5420, "lon": -8.3180},
+        {"lat": 39.5435, "lon": -8.3160},
+        {"lat": 39.5450, "lon": -8.3140}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 1002,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem de Alqueva",
+        "name:es": "Presa de Alqueva",
+        "operator": "EDP",
+        "height": "96",
+        "start_date": "2002",
+        "wikidata": "Q1156719",
+        "wikipedia": "pt:Barragem de Alqueva"
+      },
+      "geometry": [
+        {"lat": 38.1950, "lon": -7.5010},
+        {"lat": 38.1965, "lon": -7.4990},
+        {"lat": 38.1980, "lon": -7.4970}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 1003,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem da Aguieira",
+        "operator": "EDP",
+        "height": "89",
+        "start_date": "1981",
+        "wikidata": "Q964710",
+        "wikipedia": "pt:Barragem da Aguieira"
+      },
+      "geometry": [
+        {"lat": 40.3410, "lon": -8.2180},
+        {"lat": 40.3430, "lon": -8.2160},
+        {"lat": 40.3450, "lon": -8.2140}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 1004,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem de Odeleite",
+        "operator": "Águas do Algarve",
+        "height": "65",
+        "start_date": "1997",
+        "wikidata": "Q964720"
+      },
+      "geometry": [
+        {"lat": 37.3180, "lon": -7.4820},
+        {"lat": 37.3200, "lon": -7.4800},
+        {"lat": 37.3220, "lon": -7.4780}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 1005,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem do Alto Lindoso",
+        "operator": "EDP",
+        "height": "110",
+        "start_date": "1992",
+        "wikidata": "Q964730",
+        "wikipedia": "pt:Barragem do Alto Lindoso"
+      },
+      "geometry": [
+        {"lat": 41.8680, "lon": -8.2020},
+        {"lat": 41.8700, "lon": -8.2000},
+        {"lat": 41.8720, "lon": -8.1980}
+      ]
+    },
+    {
+      "type": "node",
+      "id": 1100,
+      "lat": 38.8500,
+      "lon": -7.0500,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem do Caia",
+        "operator": "Associação de Regantes",
+        "height": "35",
+        "start_date": "1967"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1101,
+      "lat": 38.0200,
+      "lon": -7.9000,
+      "tags": {
+        "waterway": "dam",
+        "name": "Barragem do Roxo",
+        "height": "32"
+      }
+    }
+  ]
+}

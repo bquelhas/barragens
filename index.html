@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <meta name="description" content="Mapa interativo de barragens, açudes, albufeiras e infraestruturas associadas de Portugal e Espanha, com dados do OpenStreetMap." />
+  <title>Barragens de Portugal e Espanha</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f6feb'/%3E%3Cpath d='M4 20h24v3H4z' fill='%23fff'/%3E%3Cpath d='M6 8h6v12H6z' fill='%23fff'/%3E%3Cpath d='M14 13h12v7H14z' fill='%239ecbff'/%3E%3C/svg%3E" />
+
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Barra superior -->
+  <header id="topbar">
+    <button id="btn-sidebar" class="icon-btn" aria-label="Abrir menu de camadas" aria-expanded="false">☰</button>
+
+    <h1 class="brand">Barragens <span class="brand-sub">PT + ES</span></h1>
+
+    <div id="search-wrap">
+      <input id="search-input" type="search" autocomplete="off"
+             placeholder="Procurar barragem, albufeira ou rio…"
+             aria-label="Procurar" />
+      <ul id="search-results" role="listbox" hidden></ul>
+    </div>
+
+    <div class="topbar-actions">
+      <button id="btn-dark" class="icon-btn" aria-label="Alternar modo escuro" title="Modo escuro">🌙</button>
+      <button id="btn-help" class="icon-btn" aria-label="Ajuda" title="Ajuda">?</button>
+    </div>
+  </header>
+
+  <!-- Aviso de dados de amostra -->
+  <div id="sample-banner" hidden>
+    ⚠ Estás a ver <strong>dados de amostra</strong> (poucas barragens). Corre o
+    <code>scripts/build_data.py</code> ou a GitHub Action para carregar os dados reais do OpenStreetMap.
+  </div>
+
+  <!-- Painel lateral esquerdo: camadas, filtros e legenda -->
+  <aside id="sidebar" aria-label="Camadas e filtros">
+    <section class="side-block">
+      <h2>Camadas</h2>
+      <ul id="layer-list" class="layer-list"></ul>
+    </section>
+
+    <section class="side-block">
+      <h2>Filtros</h2>
+      <label class="field">
+        <span>País</span>
+        <select id="filter-country">
+          <option value="all">Portugal e Espanha</option>
+          <option value="PT">Só Portugal</option>
+          <option value="ES">Só Espanha</option>
+        </select>
+      </label>
+
+      <fieldset class="field">
+        <legend>Uso</legend>
+        <div id="filter-uso" class="check-grid"></div>
+      </fieldset>
+
+      <label class="field inline">
+        <input type="checkbox" id="filter-notion" />
+        <span>Só com página Notion ★</span>
+      </label>
+    </section>
+
+    <section class="side-block">
+      <h2>Legenda</h2>
+      <ul id="legend" class="legend"></ul>
+    </section>
+
+    <section class="side-block side-foot">
+      <p id="data-info" class="muted">A carregar informação dos dados…</p>
+      <p class="muted small">
+        Dados: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a> (ODbL).
+        Mapa base: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>.
+      </p>
+    </section>
+  </aside>
+
+  <!-- Painel de detalhe de uma barragem -->
+  <section id="detail" hidden aria-label="Detalhe da barragem" aria-live="polite">
+    <button id="detail-close" class="icon-btn detail-close" aria-label="Fechar">✕</button>
+    <div id="detail-body"></div>
+  </section>
+
+  <!-- Modal de ajuda -->
+  <div id="help-modal" class="modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <button id="help-close" class="icon-btn modal-close" aria-label="Fechar ajuda">✕</button>
+      <h2 id="help-title">Como usar</h2>
+      <ol class="help-list">
+        <li>Clica num <strong>ponto colorido</strong> (barragem) para ver os detalhes.</li>
+        <li>Usa <strong>Camadas</strong> para mostrar/ocultar albufeiras, centrais, linhas elétricas, etc. Algumas só aparecem com mais zoom.</li>
+        <li>Usa <strong>Filtros</strong> para ver só Portugal, só um tipo de uso, ou só barragens com página Notion.</li>
+        <li>Procura pelo nome no topo; clica num resultado para voar até lá.</li>
+      </ol>
+      <h3>Ligar uma barragem ao Notion</h3>
+      <p>
+        Cada barragem tem um <strong>ID Mapa</strong> (ex.: <code>way/123456</code>).
+        No Notion, cola esse ID na propriedade de texto <strong>ID Mapa</strong> da página da barragem.
+        Também podes colar o link completo do OpenStreetMap — o script normaliza por ti.
+      </p>
+      <p class="muted small">O URL desta página guarda o estado (barragem selecionada, posição e zoom), por isso podes partilhá-lo.</p>
+    </div>
+  </div>
+
+  <!-- Sobreposição de carregamento -->
+  <div id="loading" class="loading" aria-hidden="true">
+    <div class="spinner"></div>
+    <p>A carregar mapa e dados…</p>
+  </div>
+
+  <div id="map" aria-label="Mapa de barragens"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

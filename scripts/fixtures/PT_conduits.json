@@ -1,0 +1,32 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "way",
+      "id": 6001,
+      "tags": {
+        "waterway": "canal",
+        "name": "Canal do Alqueva (amostra)",
+        "operator": "EDIA"
+      },
+      "geometry": [
+        {"lat": 38.2100, "lon": -7.5300},
+        {"lat": 38.1800, "lon": -7.4600}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 6002,
+      "tags": {
+        "man_made": "pipeline",
+        "substance": "water",
+        "name": "Conduta de Alqueva (amostra)"
+      },
+      "geometry": [
+        {"lat": 38.1950, "lon": -7.5100},
+        {"lat": 38.1750, "lon": -7.4700}
+      ]
+    }
+  ]
+}

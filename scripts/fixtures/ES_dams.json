@@ -1,0 +1,44 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "way",
+      "id": 8001,
+      "tags": {
+        "waterway": "dam",
+        "name": "Presa de Aldeadávila",
+        "name:pt": "Barragem de Aldeadávila",
+        "operator": "Iberdrola",
+        "height": "140",
+        "start_date": "1962",
+        "wikidata": "Q9099977",
+        "wikipedia": "es:Presa de Aldeadávila"
+      },
+      "geometry": [
+        {"lat": 41.2390, "lon": -6.6230},
+        {"lat": 41.2410, "lon": -6.6210},
+        {"lat": 41.2430, "lon": -6.6190}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 8002,
+      "tags": {
+        "waterway": "dam",
+        "name": "Presa de Almendra",
+        "name:pt": "Barragem de Almendra",
+        "operator": "Iberdrola",
+        "height": "202",
+        "start_date": "1970",
+        "wikidata": "Q9099978",
+        "wikipedia": "es:Presa de Almendra"
+      },
+      "geometry": [
+        {"lat": 41.2940, "lon": -6.3380},
+        {"lat": 41.2960, "lon": -6.3360},
+        {"lat": 41.2980, "lon": -6.3340}
+      ]
+    }
+  ]
+}

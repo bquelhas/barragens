@@ -1,0 +1,42 @@
+{
+  "version": 0.6,
+  "generator": "fixture de amostra (não é a Overpass real)",
+  "elements": [
+    {
+      "type": "way",
+      "id": 9001,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Embalse de Aldeadávila",
+        "usage": "hydro",
+        "operator": "Iberdrola"
+      },
+      "geometry": [
+        {"lat": 41.2300, "lon": -6.6400},
+        {"lat": 41.2600, "lon": -6.6400},
+        {"lat": 41.2600, "lon": -6.6000},
+        {"lat": 41.2300, "lon": -6.6000},
+        {"lat": 41.2300, "lon": -6.6400}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 9002,
+      "tags": {
+        "natural": "water",
+        "water": "reservoir",
+        "name": "Embalse de Almendra",
+        "usage": "hydro",
+        "operator": "Iberdrola"
+      },
+      "geometry": [
+        {"lat": 41.2850, "lon": -6.3500},
+        {"lat": 41.3100, "lon": -6.3500},
+        {"lat": 41.3100, "lon": -6.3200},
+        {"lat": 41.2850, "lon": -6.3200},
+        {"lat": 41.2850, "lon": -6.3500}
+      ]
+    }
+  ]
+}
