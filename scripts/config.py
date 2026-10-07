@@ -154,13 +154,17 @@ SIMPLIFY_TOLERANCE_M = {
     "dams": 0.0,
     "dam_geoms": 2.0,
     "weirs": 0.0,
-    "reservoirs": 15.0,
+    "reservoirs": 20.0,
     "plants": 0.0,
     "substations": 0.0,
-    "power_lines": 30.0,
-    "conduits": 20.0,
+    "power_lines": 40.0,
+    "conduits": 30.0,
     "bairros": 10.0,
 }
+
+# Albufeiras: manter só as ligadas a uma barragem OU com área >= este valor.
+# (descarta charcas e tanques que engordavam a camada sem utilidade)
+MIN_RESERVOIR_AREA_HA = 5.0
 
 COORD_DECIMALS = 5  # arredondamento das coordenadas (~1 m)
 

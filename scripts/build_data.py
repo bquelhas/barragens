@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import unicodedata
 from datetime import datetime, timezone
@@ -389,6 +390,41 @@ def associate(dams: list[dict], reservoirs: list[dict], plants: list[dict]):
 
 
 # ---------------------------------------------------------------------------
+# Albufeiras: ligação à barragem e filtragem
+# ---------------------------------------------------------------------------
+
+def link_and_filter_reservoirs(reservoirs: list[dict], dams: list[dict]) -> list[dict]:
+    """
+    Liga cada albufeira à sua barragem (propriedade `dam_id`) e filtra as
+    irrelevantes: ficam só as **ligadas a uma barragem** ou com
+    **área >= `MIN_RESERVOIR_AREA_HA`** (descarta charcas/tanques).
+
+    Também guarda `area_ha` na própria albufeira (usada pela interface).
+    """
+    # Mapa inverso albufeira -> barragem (a partir de dam["reservoir_id"]).
+    by_reservoir: dict[str, str] = {}
+    for d in dams:
+        rid = d.get("reservoir_id")
+        if rid and rid not in by_reservoir:
+            by_reservoir[rid] = d["dam_id"]
+
+    kept = []
+    dropped = 0
+    for r in reservoirs:
+        rid = f'{r["osm_type"]}/{r["osm_id"]}'
+        area = geo.area_ha(r["geom"])
+        r["area_ha"] = area
+        r["dam_id"] = by_reservoir.get(rid)
+        if r["dam_id"] or area >= config.MIN_RESERVOIR_AREA_HA:
+            kept.append(r)
+        else:
+            dropped += 1
+    log(f"[albufeiras] {len(kept)} mantidas, {dropped} descartadas "
+        f"(< {config.MIN_RESERVOIR_AREA_HA} ha e sem barragem)")
+    return kept
+
+
+# ---------------------------------------------------------------------------
 # Conversão de features para GeoJSON
 # ---------------------------------------------------------------------------
 
@@ -477,15 +513,25 @@ def write_layer(name: str, features: list[dict]):
     log(f"[saída] {name}: {', '.join(written)}")
 
 
+def _country_of(layer: str, filename: str) -> str | None:
+    """Extrai o país do nome do ficheiro (ex.: dams_pt.geojson -> PT)."""
+    m = re.match(rf"^{re.escape(layer)}_([a-zA-Z]+)\.geojson$", filename)
+    return m.group(1).upper() if m else None
+
+
 def rebuild_manifest(manifest: dict):
     """
-    Reconstrói `layers`/`counts` a partir dos ficheiros que existem em `data/`.
+    Reconstrói `layers`/`counts`/`countries`/`counts_by_country` a partir dos
+    ficheiros que existem em `data/`.
 
     Assim, uma extração de um só país preserva os ficheiros do outro país que
     já estejam no repositório (comportamento de "merge").
     """
     layers: dict[str, list] = {}
     counts: dict[str, int] = {}
+    by_country: dict[str, dict[str, int]] = {}
+    countries: set[str] = set()
+
     for name in LAYER_KEYS:
         files = sorted(p.name for p in config.DATA_DIR.glob(f"{name}_*.geojson"))
         single = config.DATA_DIR / f"{name}.geojson"
@@ -498,12 +544,21 @@ def rebuild_manifest(manifest: dict):
         for fn in files:
             try:
                 with (config.DATA_DIR / fn).open(encoding="utf-8") as fh:
-                    total += len(json.load(fh).get("features", []))
+                    n = len(json.load(fh).get("features", []))
             except Exception as exc:  # noqa: BLE001
                 log(f"[aviso] não consegui ler {fn}: {exc}")
+                n = 0
+            total += n
+            cc = _country_of(name, fn)
+            if cc:
+                countries.add(cc)
+                by_country.setdefault(cc, {})[name] = by_country.setdefault(cc, {}).get(name, 0) + n
         counts[name] = total
+
     manifest["layers"] = layers
     manifest["counts"] = counts
+    manifest["counts_by_country"] = by_country
+    manifest["countries"] = sorted(countries)
     manifest["total_features"] = sum(counts.values())
 
 
@@ -630,6 +685,7 @@ def run(countries: list[str], offline: bool, force: bool, skip_infra: bool = Fal
     # -- Associação espacial ---------------------------------------------
     log("[build] a associar albufeiras e centrais às barragens...")
     associate(all_dams, all_reservoirs, all_plants)
+    all_reservoirs = link_and_filter_reservoirs(all_reservoirs, all_dams)
 
     # -- Filtragem fina das infraestruturas ------------------------------
     def within_dams(feats, max_m):
@@ -763,20 +819,17 @@ def write_reservoirs(reservoirs: list[dict]):
     features = []
     for r in reservoirs:
         tags = r["tags"]
+        # Propriedades mínimas: só o que a interface usa (pesquisa, destaque).
         props = {
-            "osm_type": r["osm_type"],
-            "osm_id": r["osm_id"],
             "reservoir_id": f'{r["osm_type"]}/{r["osm_id"]}',
+            "dam_id": r.get("dam_id"),
             "country": r["country"],
             "name": tags.get("name"),
             "name_pt": first_tag(tags, "name:pt"),
             "name_es": first_tag(tags, "name:es"),
             "usage": tags.get("usage"),
             "reservoir_type": tags.get("reservoir_type"),
-            "area_ha": round(geo.area_ha(r["geom"]), 1),
-            "operator": tags.get("operator"),
-            "wikidata": tags.get("wikidata"),
-            "wikipedia": tags.get("wikipedia"),
+            "area_ha": round(r.get("area_ha", geo.area_ha(r["geom"])), 1),
         }
         add_feature(features, r, props, simplify_and_round(r["geom"], "reservoirs"))
     write_layer("reservoirs", features)
