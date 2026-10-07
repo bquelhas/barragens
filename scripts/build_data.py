@@ -495,7 +495,7 @@ def write_geojson(path: Path, features: list[dict]):
 # Build
 # ---------------------------------------------------------------------------
 
-def run(countries: list[str], offline: bool, force: bool):
+def run(countries: list[str], offline: bool, force: bool, skip_infra: bool = False):
     global CURRENT_COUNTRIES
     CURRENT_COUNTRIES = countries
     prev = read_previous_manifest()
@@ -584,6 +584,11 @@ def run(countries: list[str], offline: bool, force: bool):
                       "radius": config.INFRA_RADIUS_M["conduits"]}
                      for f in config.INFRA_LAYERS["conduits"]],
     }
+
+    # Com `--skip-infra` não vamos buscar centrais/subestações/linhas/condutas.
+    if skip_infra:
+        collect_map = {}
+        log("[build] --skip-infra: a saltar infraestruturas")
 
     for cc in countries:
         area_expr = config.COUNTRIES[cc]
@@ -774,6 +779,8 @@ def main():
                         help="lista separada por vírgulas (ex.: PT,ES)")
     parser.add_argument("--force", action="store_true",
                         help="ignora a validação mínima de barragens")
+    parser.add_argument("--skip-infra", action="store_true",
+                        help="não extrai centrais/subestações/linhas/condutas")
     args = parser.parse_args()
 
     countries = [c.strip().upper() for c in args.countries.split(",") if c.strip()]
@@ -781,7 +788,7 @@ def main():
     if invalid:
         raise SystemExit(f"Países inválidos: {invalid}. Válidos: {list(config.COUNTRIES)}")
 
-    run(countries, args.offline, args.force)
+    run(countries, args.offline, args.force, args.skip_infra)
 
 
 if __name__ == "__main__":

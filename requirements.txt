@@ -1,4 +1,9 @@
 # Dependências do pipeline de dados (Python 3.10+).
 # Instalar com: pip install -r requirements.txt
+
+# Necessárias para o pipeline principal e para geo.py
 shapely>=2.0
 pyproj>=3.4
+
+# Necessária só para a alternativa baseada em extracts do Geofabrik (.pbf)
+osmium>=3.6

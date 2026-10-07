@@ -120,6 +120,27 @@ A API pública da Overpass é gratuita e por vezes está sobrecarregada. O scrip
 já tenta vários espelhos, espera e repete, e divide a extração por regiões se
 o país inteiro der *timeout*. Mesmo assim, tenta novamente mais tarde se falhar.
 
+### Alternativa recomendada: extracts do Geofabrik (.pbf)
+
+Quando a Overpass está saturada (502/504/timeout), há um caminho **mais fiável**:
+usar os ficheiros oficiais do [Geofabrik](https://download.geofabrik.de/europe/),
+que não dependem da Overpass:
+
+```bash
+python scripts/build_data_pbf.py --countries PT          # Portugal
+python scripts/build_data_pbf.py --countries PT --skip-infra
+python scripts/build_data_pbf.py --countries PT,ES       # ambos
+```
+
+Este script descarrega o `.pbf` do país (com cache em `/tmp/osm-cache`, ou o
+diretório indicado na variável `OSM_CACHE`), filtra em memória com a biblioteca
+`pyosmium` e produz exatamente os mesmos ficheiros em `data/`. É a forma mais
+robusta para Portugal + Espanha (PT ~425 MB, ES ~1,5 GB).
+
+> Nota: processar os `.pbf` exige alguma memória RAM (o índice de nós do
+> `locations=True` fica em memória). Em máquinas com pouca RAM, corre um país
+de cada vez.
+
 ---
 
 ## 5. Publicar no GitHub Pages (passo a passo, sem experiência técnica)
