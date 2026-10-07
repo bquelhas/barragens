@@ -414,7 +414,7 @@ def simplify_and_round(geometry, layer: str):
 # ---------------------------------------------------------------------------
 
 # Todas as camadas que o manifest pode anunciar.
-LAYER_KEYS = ["dams", "reservoirs", "weirs", "plants",
+LAYER_KEYS = ["dams", "dam_geoms", "reservoirs", "weirs", "plants",
               "substations", "power_lines", "conduits", "bairros"]
 
 # Países processados na execução atual (definido em `run`).
@@ -629,6 +629,7 @@ def run(countries: list[str], offline: bool, force: bool, skip_infra: bool = Fal
     # -- Escrever camadas (por país) -------------------------------------
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     write_dams(all_dams)
+    write_dam_geoms(all_dams)
     write_reservoirs(all_reservoirs)
     write_simple(all_weirs, "weirs", "name")
     write_simple(all_plants, "plants", "name", extra=attrs_power)
@@ -715,6 +716,27 @@ def write_dams(dams: list[dict]):
         features.append(feature_to_geojson(
             d, props, simplify_and_round(d["point"], "dams")))
     write_layer("dams", features)
+
+
+def write_dam_geoms(dams: list[dict]):
+    """
+    Escreve a geometria real de cada barragem (linha ou polígono), separada
+    da camada de pontos. O frontend desenha-a como contorno a partir de
+    certo zoom, ligada por `dam_id`.
+    """
+    features = []
+    for d in dams:
+        props = {
+            "dam_id": d["dam_id"],
+            "osm_type": d["osm_type"],
+            "osm_id": d["osm_id"],
+            "country": d["country"],
+            "name": d["tags"].get("name"),
+            "uso": d["uso"],
+        }
+        features.append(feature_to_geojson(
+            d, props, simplify_and_round(d["geom"], "dam_geoms")))
+    write_layer("dam_geoms", features)
 
 
 def write_reservoirs(reservoirs: list[dict]):

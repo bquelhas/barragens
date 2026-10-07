@@ -51,6 +51,12 @@ export const LAYERS = [
     minzoom: 0, default: true, legendSwatch: "circle", primary: true,
   },
   {
+    // Contorno real da barragem (linha/polígono). Não aparece como opção
+    // própria no painel: segue a camada "Barragens". Só surge com zoom alto.
+    key: "dam_geoms", label: "Contorno das barragens", kind: "outline",
+    minzoom: 12, default: true, internal: true, color: "#0b3d91", legendSwatch: "line",
+  },
+  {
     key: "reservoirs", label: "Albufeiras", kind: "polygon",
     minzoom: 4, default: true, color: "#2b8fe0", legendSwatch: "polygon",
   },

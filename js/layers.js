@@ -153,6 +153,23 @@ function addGeneric(def, fc) {
       id: `${def.key}-line`, type: "line", source: srcId, minzoom: def.minzoom,
       paint: { "line-color": color, "line-width": 1.4, "line-opacity": 0.85 },
     });
+  } else if (def.kind === "outline") {
+    // Contorno de estruturas (linhas e polígonos): preenchimento suave
+    // (só afeta polígonos) + traço. Aparece apenas a partir de `minzoom`.
+    // O contorno das barragens é colorido pelo uso (tal como as bolinhas).
+    const colorExpr = def.key === "dam_geoms" ? usoColorExpression() : color;
+    map.addLayer({
+      id: `${def.key}-fill`, type: "fill", source: srcId, minzoom: def.minzoom,
+      paint: { "fill-color": colorExpr, "fill-opacity": 0.25 },
+    });
+    map.addLayer({
+      id: `${def.key}-line`, type: "line", source: srcId, minzoom: def.minzoom,
+      paint: {
+        "line-color": colorExpr,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 12, 2, 16, 4],
+        "line-opacity": 0.95,
+      },
+    });
   } else if (def.kind === "polygon") {
     map.addLayer({
       id: `${def.key}-fill`, type: "fill", source: srcId, minzoom: def.minzoom,
@@ -212,7 +229,7 @@ function addDams(fc) {
     id: "dams-points", type: "circle", source: damsSourceId, minzoom: 0,
     filter: ["!", ["has", "point_count"]],
     paint: {
-      "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 4, 10, 6.5, 14, 9],
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 4, 10, 5.5, 14, 6],
       "circle-color": usoColorExpression(),
       "circle-stroke-color": "#ffffff",
       "circle-stroke-width": ["case", ["boolean", ["feature-state", "selected"], false], 3, 1],
@@ -279,11 +296,14 @@ const layerIdsByKey = (key) => {
   if (!def) return [];
   if (def.kind === "line") return [`${key}-line`];
   if (def.kind === "polygon") return [`${key}-fill`, `${key}-outline`];
+  if (def.kind === "outline") return [`${key}-fill`, `${key}-line`];
   return [`${key}-point`];
 };
 
 export function setVisibility(key, visible, force = false) {
   state.visible[key] = visible;
+  // O contorno segue sempre a camada "Barragens".
+  if (key === "dams") setVisibility("dam_geoms", visible, force);
   if (!state.loaded.has(key) && visible) {
     ensureLayer(key).then(() => state.map && applyFilters(state.filters));
     return;
@@ -330,6 +350,13 @@ export function applyFilters(filters) {
   }
   if (map.getLayer("dams-cluster-count")) {
     map.setLayoutProperty("dams-cluster-count", "text-field", ["to-string", countExpr]);
+  }
+
+  // O contorno das barragens (dam_geoms) respeita os mesmos filtros.
+  const outlineConds = countryUsoNotionConds(filters, false);
+  const outlineFilter = outlineConds.length ? ["all", ...outlineConds] : null;
+  for (const id of ["dam_geoms-line", "dam_geoms-fill"]) {
+    if (map.getLayer(id)) map.setFilter(id, outlineFilter);
   }
 }
 

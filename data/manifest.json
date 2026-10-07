@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-07T15:57:05+00:00",
+  "generated_at": "2026-10-07T16:26:26+00:00",
   "sample": true,
   "sample_countries": [
     "ES"
@@ -12,15 +12,22 @@
   ],
   "counts": {
     "dams": 743,
+    "dam_geoms": 741,
     "reservoirs": 29952,
     "weirs": 2372,
-    "plants": 2,
+    "plants": 231,
+    "substations": 198,
+    "power_lines": 1576,
+    "conduits": 2518,
     "bairros": 0
   },
   "layers": {
     "dams": [
       "dams_es.geojson",
       "dams_pt.geojson"
+    ],
+    "dam_geoms": [
+      "dam_geoms_pt.geojson"
     ],
     "reservoirs": [
       "reservoirs_es.geojson",
@@ -30,12 +37,22 @@
       "weirs_pt.geojson"
     ],
     "plants": [
-      "plants_es.geojson"
+      "plants_es.geojson",
+      "plants_pt.geojson"
+    ],
+    "substations": [
+      "substations_pt.geojson"
+    ],
+    "power_lines": [
+      "power_lines_pt.geojson"
+    ],
+    "conduits": [
+      "conduits_pt.geojson"
     ],
     "bairros": [
       "bairros.geojson"
     ]
   },
-  "total_features": 33069,
+  "total_features": 38331,
   "notion_count": 0
 }

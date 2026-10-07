@@ -41,6 +41,7 @@ function buildLayerList(manifest) {
   dom.layerList.innerHTML = "";
 
   for (const def of LAYERS) {
+    if (def.internal) continue; // camadas ligadas a outra (ex.: contorno das barragens)
     const hasData = Array.isArray(available[def.key]) && available[def.key].length > 0;
     if (!hasData) continue;
 

@@ -270,6 +270,7 @@ def run(countries, skip_infra, force):
 
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     build_data.write_dams(all_dams)
+    build_data.write_dam_geoms(all_dams)
     build_data.write_reservoirs(all_reservoirs)
     build_data.write_simple(all_weirs, "weirs", "name")
     build_data.write_simple(all_plants, "plants", "name", extra=build_data.attrs_power)

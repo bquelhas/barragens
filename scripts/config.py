@@ -152,6 +152,7 @@ USO_VALUES = [
 # Tolerância (metros) de simplificação Douglas-Peucker por camada.
 SIMPLIFY_TOLERANCE_M = {
     "dams": 0.0,
+    "dam_geoms": 2.0,
     "weirs": 0.0,
     "reservoirs": 15.0,
     "plants": 0.0,
