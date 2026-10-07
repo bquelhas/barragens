@@ -267,8 +267,8 @@ do Notion.)
 * **Associação espacial:** a ligação barragem↔albufeira↔central é feita por
   proximidade (200 m / 2 km / 3 km). Pode haver falsos positivos (sobretudo em
   vales com várias infraestruturas próximas).
-* **Filtros e agrupamento:** os filtros aplicam-se aos pontos; os "bolhas" de
-  agrupamento (clusters) usam uma contagem aproximada.
+* **Filtros e agrupamento:** os filtros aplicam-se às barragens individuais;
+  os grupos ("bolhas") mostram sempre o total de barragens que contêm.
 * **Tamanho:** para Portugal + Espanha, alguns ficheiros podem ficar grandes.
   O pipeline divide automaticamente as camadas maiores por país e o site
   carrega as camadas pesadas só a partir de um certo zoom.

@@ -65,8 +65,10 @@ async function loadLayerData(key) {
   if (!files || files.length === 0) return null;
 
   const features = [];
+  // Versão dos dados para evitar cache obsoleta (muda com o manifest).
+  const v = encodeURIComponent(state.manifest?.generated_at || Date.now());
   for (const file of files) {
-    const fc = await fetchJson(`data/${file}`, null);
+    const fc = await fetchJson(`data/${file}?v=${v}`, null);
     if (fc?.features) features.push(...fc.features);
   }
 
@@ -210,7 +212,6 @@ function addDams(fc) {
     cluster: true,
     clusterRadius: CLUSTER.radius,
     clusterMaxZoom: CLUSTER.maxZoom,
-    clusterProperties: buildClusterProperties(),
   });
 
   // Grupos (clusters)
@@ -282,18 +283,6 @@ function usoColorExpression() {
   return expr;
 }
 
-function buildClusterProperties() {
-  const props = {
-    c_pt: ["+", ["case", ["==", ["get", "country"], "PT"], 1, 0]],
-    c_es: ["+", ["case", ["==", ["get", "country"], "ES"], 1, 0]],
-    c_notion: ["+", ["case", ["has", "notion_url"], 1, 0]],
-  };
-  USO_ORDER.forEach((uso, i) => {
-    props[`c_u${i}`] = ["+", ["case", ["==", ["get", "uso"], uso], 1, 0]];
-  });
-  return props;
-}
-
 // ---------------------------------------------------------------------
 // Visibilidade
 // ---------------------------------------------------------------------
@@ -349,15 +338,14 @@ export function applyFilters(filters) {
     map.setFilter("dams-selected", pointFilter);
   }
 
-  // Clusters: esconde os que não têm nenhuma barragem que passe nos filtros.
-  // O guarda `has point_count` é essencial: sem ele, a expressão de contagem
-  // seria avaliada em pontos individuais (valor nulo).
-  const countExpr = clusterCountExpression(filters);
+  // Clusters: o guarda `has point_count` separa-os dos pontos individuais.
+  // (Os filtros aplicam-se aos pontos; os grupos mostram sempre o total.)
   if (map.getLayer("dams-clusters")) {
-    map.setFilter("dams-clusters", ["all", ["has", "point_count"], [">", countExpr, 0]]);
+    map.setFilter("dams-clusters", ["has", "point_count"]);
   }
   if (map.getLayer("dams-cluster-count")) {
-    map.setLayoutProperty("dams-cluster-count", "text-field", ["to-string", countExpr]);
+    map.setLayoutProperty("dams-cluster-count", "text-field",
+      ["to-string", ["get", "point_count"]]);
   }
 
   // O contorno das barragens (dam_geoms) respeita os mesmos filtros.
@@ -378,23 +366,6 @@ function countryUsoNotionConds(filters, isCluster) {
   }
   if (filters.onlyNotion) conds.push(["has", "notion_url"]);
   return conds;
-}
-
-/** Expressão com o nº de barragens que passa nos filtros dentro de um grupo. */
-function clusterCountExpression(filters) {
-  const parts = [];
-  if (filters.country && filters.country !== "all") {
-    parts.push(["get", `c_${filters.country.toLowerCase()}`]);
-  }
-  if (filters.usos && filters.usos.length > 0 && filters.usos.length < USO_ORDER.length) {
-    const idxs = filters.usos.map((u) => ["get", `c_u${USO_ORDER.indexOf(u)}`]);
-    parts.push(idxs.length === 1 ? idxs[0] : ["+", ...idxs]);
-  }
-  if (filters.onlyNotion) parts.push(["get", "c_notion"]);
-
-  if (parts.length === 0) return ["get", "point_count"];
-  if (parts.length === 1) return parts[0];
-  return ["min", ...parts]; // aproximação: 0 se qualquer dimensão não tiver nada
 }
 
 // ---------------------------------------------------------------------

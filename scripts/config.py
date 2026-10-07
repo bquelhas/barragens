@@ -164,6 +164,12 @@ SIMPLIFY_TOLERANCE_M = {
 
 COORD_DECIMALS = 5  # arredondamento das coordenadas (~1 m)
 
+# Geometrias degeneradas (área/comprimento ~0) são descartadas. O
+# arredondamento a 5 casas pode colapsar polígonos/linhas minúsculos, e o
+# MapLibre não gosta de geometrias de área zero.
+MIN_AREA_M2 = 1.0
+MIN_LEN_M = 1.0
+
 # A partir deste tamanho (bytes) uma camada é dividida por país.
 SPLIT_THRESHOLD_BYTES = 1_500_000
 

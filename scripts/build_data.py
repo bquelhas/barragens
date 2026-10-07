@@ -36,7 +36,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config  # noqa: E402
 import geo  # noqa: E402
 import overpass  # noqa: E402
-from shapely.geometry import mapping  # noqa: E402
+from shapely.geometry import mapping, shape  # noqa: E402
 from shapely.strtree import STRtree  # noqa: E402
 
 
@@ -401,12 +401,34 @@ def feature_to_geojson(feature: dict, properties: dict, geometry: dict) -> dict:
     }
 
 
+def add_feature(features: list, feature: dict, properties: dict, geom_dict):
+    """Acrescenta a feature, ignorando geometrias degeneradas (`None`)."""
+    if geom_dict is None:
+        return
+    features.append(feature_to_geojson(feature, properties, geom_dict))
+
+
 def simplify_and_round(geometry, layer: str):
+    """
+    Simplifica, arredonda e devolve um dicionário GeoJSON.
+
+    Devolve `None` se a geometria ficar degenerada (área/comprimento ~0)
+    depois do arredondamento — essas features são descartadas.
+    """
     tol = config.SIMPLIFY_TOLERANCE_M.get(layer, 0.0)
     geom = geo.strip_z(geometry)
     geom = geo.simplify_metric(geom, tol)
-    mapped = mapping(geom)
-    return geo.round_coords(mapped)
+    mapped = geo.round_coords(mapping(geom))
+
+    rounded = shape(mapped)
+    if rounded.is_empty:
+        return None
+    metric = geo.to_metric(rounded)
+    if metric.geom_type in ("Polygon", "MultiPolygon") and metric.area < config.MIN_AREA_M2:
+        return None
+    if metric.geom_type in ("LineString", "MultiLineString") and metric.length < config.MIN_LEN_M:
+        return None
+    return mapped
 
 
 # ---------------------------------------------------------------------------
@@ -713,8 +735,7 @@ def write_dams(dams: list[dict]):
             "plant_power_mw": d.get("plant_power_mw"),
             "members": d.get("members", []),
         })
-        features.append(feature_to_geojson(
-            d, props, simplify_and_round(d["point"], "dams")))
+        add_feature(features, d, props, simplify_and_round(d["point"], "dams"))
     write_layer("dams", features)
 
 
@@ -734,8 +755,7 @@ def write_dam_geoms(dams: list[dict]):
             "name": d["tags"].get("name"),
             "uso": d["uso"],
         }
-        features.append(feature_to_geojson(
-            d, props, simplify_and_round(d["geom"], "dam_geoms")))
+        add_feature(features, d, props, simplify_and_round(d["geom"], "dam_geoms"))
     write_layer("dam_geoms", features)
 
 
@@ -758,8 +778,7 @@ def write_reservoirs(reservoirs: list[dict]):
             "wikidata": tags.get("wikidata"),
             "wikipedia": tags.get("wikipedia"),
         }
-        features.append(feature_to_geojson(
-            r, props, simplify_and_round(r["geom"], "reservoirs")))
+        add_feature(features, r, props, simplify_and_round(r["geom"], "reservoirs"))
     write_layer("reservoirs", features)
 
 
@@ -778,8 +797,7 @@ def write_simple(feats: list[dict], layer: str, _name_field: str, extra=None):
         }
         if extra:
             props.update(extra(tags))
-        features.append(feature_to_geojson(
-            f, props, simplify_and_round(f["geom"], layer)))
+        add_feature(features, f, props, simplify_and_round(f["geom"], layer))
     write_layer(layer, features)
 
 
