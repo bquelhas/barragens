@@ -32,6 +32,7 @@ export const PALETTE = {
   waterSelected: "#123f5c",
   related: "#c8892b",      // rede elétrica relacionada (âmbar dessaturado)
   notion: "#d9a441",       // ★ / anel dourado
+  poi: "#8a5a44",          // pontos de interesse (património)
   cluster: "#17516e",
 };
 
@@ -69,6 +70,7 @@ export const LAYERS = [
   { key: "substations", label: "Subestações", kind: "point", minzoom: 9, default: false, color: "#8e7cc3", legendSwatch: "circle" },
   { key: "power_lines", label: "Linhas elétricas", kind: "line", minzoom: 8, default: false, color: "#c8892b", legendSwatch: "line" },
   { key: "conduits", label: "Condutas e canais", kind: "line", minzoom: 9, default: false, color: "#4f9aa8", legendSwatch: "line" },
+  { key: "pois", label: "Pontos de interesse", kind: "poi", minzoom: 11, default: true, color: "#8a5a44", legendSwatch: "polygon" },
   { key: "bairros", label: "Bairros barragistas", kind: "polygon", minzoom: 7, default: false, color: "#b07aa1", legendSwatch: "polygon", future: true },
 ];
 

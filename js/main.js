@@ -180,6 +180,10 @@ function wireMapEvents() {
     map.on("mouseenter", "reservoirs-fill", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "reservoirs-fill", () => (map.getCanvas().style.cursor = ""));
   }
+  if (map.getLayer("pois-fill")) {
+    map.on("mouseenter", "pois-fill", () => (map.getCanvas().style.cursor = "pointer"));
+    map.on("mouseleave", "pois-fill", () => (map.getCanvas().style.cursor = ""));
+  }
 
   // Um único handler de clique. Prioridade: cluster > barragem > albufeira >
   // barragem mais próxima (garante que continua clicável com ícones sobrepostos).
@@ -199,6 +203,10 @@ function wireMapEvents() {
     const resLayers = ["reservoirs-fill", "reservoirs-outline"].filter((id) => map.getLayer(id));
     const resHits = resLayers.length ? map.queryRenderedFeatures(e.point, { layers: resLayers }) : [];
     if (resHits.length) { openReservoirProps(resHits[0].properties); return; }
+
+    const poiLayers = ["pois-fill", "pois-line"].filter((id) => map.getLayer(id));
+    const poiHits = poiLayers.length ? map.queryRenderedFeatures(e.point, { layers: poiLayers }) : [];
+    if (poiHits.length) { openPoi(poiHits[0].properties); return; }
 
     const near = nearestDam(e.point, 22);
     if (near) openDam(near);
@@ -335,6 +343,14 @@ function openReservoirProps(props) {
   if (props.dam_id) { openDamById(props.dam_id, null); return; }
   layers.selectDam(null, props.reservoir_id);
   panel.showReservoir(props);
+  discover.markSelected(null);
+  writeHash();
+}
+
+/** Mostra o cartão de um ponto de interesse (património). */
+function openPoi(props) {
+  layers.clearSelection();
+  panel.showPoi(props);
   discover.markSelected(null);
   writeHash();
 }

@@ -314,6 +314,27 @@ export function showReservoir(p) {
   document.getElementById("res-dam")?.addEventListener("click", () => hooks.onOpenDamById?.(p.dam_id));
 }
 
+/** Cartão de um ponto de interesse (património). */
+export function showPoi(p) {
+  const name = p.name || "Ponto de interesse";
+  const kind = p.kind || "património";
+  const links = [`<a class="icon-link" href="https://www.openstreetmap.org/${escapeHtml(p.osm || "")}" target="_blank" rel="noopener">OSM</a>`];
+  const notion = p.notion_url
+    ? `<a class="btn notion block" href="${escapeHtml(p.notion_url)}" target="_blank" rel="noopener">Ver no Notion</a>` : "";
+
+  dom.detailBody.innerHTML = `
+    <div class="ficha-hero"><div class="hero-fallback">${heroSvg(PALETTE.poi)}</div></div>
+    <div class="ficha-body">
+      <h2 class="ficha-title">${escapeHtml(name)}</h2>
+      <div class="chips"><span class="chip uso" style="background:${PALETTE.poi}">${escapeHtml(kind)}</span></div>
+      ${p.descricao ? `<p>${escapeHtml(p.descricao)}</p>` : ""}
+      ${notion}
+      <div class="ficha-footer">${links.join("")}</div>
+    </div>`;
+  dom.detail.hidden = false;
+  if (matchMedia("(max-width: 780px)").matches) setSheet("half");
+}
+
 /** Mostra a data dos dados + contagens (usado no ecrã de boas-vindas). */
 export function dataInfoHtml(manifest) {
   if (!manifest) return "Informação dos dados indisponível.";

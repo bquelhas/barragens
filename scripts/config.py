@@ -147,6 +147,25 @@ USO_VALUES = [
 ]
 
 # ---------------------------------------------------------------------------
+# Pontos de interesse (camada curada)
+# ---------------------------------------------------------------------------
+# Lista curada (edita-se à mão). A geometria real é extraída do extract
+# Geofabrik com `scripts/build_pois.py` (sem Overpass).
+POIS = [
+    {
+        "osm": "relation/5625754",
+        "name": "Pousada de Picote",
+        "kind": "pousada",
+        "descricao": "Antiga casa da guarda da barragem de Picote, hoje Pousada (hotel) — património ligado à construção das grandes barragens do Douro.",
+        "dam_id": "",
+        "notion_url": "",
+    },
+]
+
+# Tolerância (metros) de simplificação da geometria dos POIs.
+POI_SIMPLIFY_M = 1.5
+
+# ---------------------------------------------------------------------------
 # Simplificação e saída
 # ---------------------------------------------------------------------------
 # Tolerância (metros) de simplificação Douglas-Peucker por camada.

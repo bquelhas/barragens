@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-07T22:13:36+00:00",
+  "generated_at": "2026-10-07T22:41:33+00:00",
   "sample": false,
   "sample_countries": [],
   "source": "OpenStreetMap (extract Geofabrik .osm.pbf)",
@@ -18,6 +18,7 @@
     "substations": 270,
     "power_lines": 7570,
     "conduits": 8553,
+    "pois": 1,
     "bairros": 0
   },
   "layers": {
@@ -53,6 +54,9 @@
       "conduits_es.geojson",
       "conduits_pt.geojson"
     ],
+    "pois": [
+      "pois.geojson"
+    ],
     "bairros": [
       "bairros.geojson"
     ]
@@ -79,6 +83,6 @@
       "conduits": 2431
     }
   },
-  "total_features": 33410,
+  "total_features": 33411,
   "notion_count": 0
 }

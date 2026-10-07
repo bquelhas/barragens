@@ -498,7 +498,7 @@ def simplify_and_round(geometry, layer: str):
 
 # Todas as camadas que o manifest pode anunciar.
 LAYER_KEYS = ["dams", "dam_geoms", "reservoirs", "weirs", "plants",
-              "substations", "power_lines", "conduits", "bairros"]
+              "substations", "power_lines", "conduits", "pois", "bairros"]
 
 # Países processados na execução atual (definido em `run`).
 CURRENT_COUNTRIES: list[str] = []
@@ -900,6 +900,8 @@ def main():
                         help="ignora a validação mínima de barragens")
     parser.add_argument("--skip-infra", action="store_true",
                         help="não extrai centrais/subestações/linhas/condutas")
+    parser.add_argument("--manifest-only", action="store_true",
+                        help="só reconstrói o manifest a partir dos ficheiros em data/")
     args = parser.parse_args()
 
     countries = [c.strip().upper() for c in args.countries.split(",") if c.strip()]
@@ -907,7 +909,27 @@ def main():
     if invalid:
         raise SystemExit(f"Países inválidos: {invalid}. Válidos: {list(config.COUNTRIES)}")
 
+    if args.manifest_only:
+        manifest_only()
+        return
+
     run(countries, args.offline, args.force, args.skip_infra)
+
+
+def manifest_only():
+    """Reconstrói o `manifest.json` a partir do que está em `data/` (sem extrair)."""
+    manifest = read_previous_manifest() or {}
+    manifest.setdefault("source", "OpenStreetMap (extrato Geofabrik / Overpass)")
+    manifest.setdefault("attribution", "© OpenStreetMap contributors")
+    manifest.setdefault("license", "ODbL")
+    manifest.setdefault("sample", False)
+    manifest.setdefault("sample_countries", [])
+    manifest["generated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    rebuild_manifest(manifest)
+    with (config.DATA_DIR / "manifest.json").open("w", encoding="utf-8") as fh:
+        json.dump(manifest, fh, ensure_ascii=False, indent=2)
+    log(f"[manifest] reconstruído: {manifest['total_features']} features, "
+        f"camadas: {', '.join(manifest['layers'])}")
 
 
 if __name__ == "__main__":

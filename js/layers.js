@@ -311,6 +311,15 @@ function addGeneric(def, fc) {
       id: `${def.key}-line`, type: "line", source: srcId, minzoom: def.minzoom,
       paint: { "line-color": colorExpr, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1.6, 16, 3.2], "line-opacity": 0.9 },
     });
+  } else if (def.kind === "poi") {
+    // Pontos de interesse (património): polígono/linha + rótulo do nome.
+    map.addLayer({ id: `${def.key}-fill`, type: "fill", source: srcId, minzoom: def.minzoom, paint: { "fill-color": color, "fill-opacity": 0.28 } });
+    map.addLayer({ id: `${def.key}-line`, type: "line", source: srcId, minzoom: def.minzoom, paint: { "line-color": color, "line-width": 1.8, "line-opacity": 0.95 } });
+    map.addLayer({
+      id: `${def.key}-label`, type: "symbol", source: srcId, minzoom: Math.max(def.minzoom, 12),
+      layout: { "text-field": ["get", "name"], "text-size": 12, "text-offset": [0, 1.1], "text-anchor": "top" },
+      paint: { "text-color": color, "text-halo-color": "#ffffff", "text-halo-width": 1.4 },
+    });
   } else if (def.kind === "polygon") {
     const outline = def.key === "reservoirs" ? PALETTE.waterOutline : color;
     map.addLayer({ id: `${def.key}-fill`, type: "fill", source: srcId, minzoom: def.minzoom, paint: { "fill-color": color, "fill-opacity": 0.35 } });
@@ -454,6 +463,7 @@ const layerIdsByKey = (key) => {
   if (def.kind === "line") return [`${key}-line`];
   if (def.kind === "polygon") return [`${key}-fill`, `${key}-outline`];
   if (def.kind === "outline") return [`${key}-fill`, `${key}-line`];
+  if (def.kind === "poi") return [`${key}-fill`, `${key}-line`, `${key}-label`];
   return [`${key}-point`];
 };
 

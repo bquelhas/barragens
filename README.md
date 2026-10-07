@@ -303,6 +303,11 @@ do Notion.)
   (país/rio/uso), grelha de factos, botão **Ver no Notion**, secção **Contribuir**
   (Copiar ID) e `<details>` de detalhes técnicos; destaca a albufeira e a
   **rede elétrica relacionada** (a âmbar), esbatendo o resto da rede.
+* **Pontos de interesse (património)**: camada curada (ex.: *Pousada de Picote*,
+  antiga casa da guarda da barragem). A lista edita-se em `scripts/config.py`
+  (`POIS`, com `osm`, `name`, `kind`, `descricao`, `dam_id`, `notion_url`) e a
+  geometria real é obtida da API do OSM com `python scripts/build_pois.py`,
+  que gera `data/pois.geojson` (sem Overpass).
 * **Ícones de barragem** desenhados (um por uso), dimensionados pela altura ou
   potência; anel dourado para quem tem página Notion.
 * **Boas-vindas** (primeira visita, reabrível com “?”): contadores por país e
