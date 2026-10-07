@@ -10,6 +10,7 @@ const state = {
   manifest: null,
   notion: {},
   loaded: new Set(),      // camadas cujo source já foi adicionado
+  loading: {},            // promessas de camadas em carregamento (evita duplicados)
   data: {},               // dados em memória por camada
   visible: {},            // visibilidade pretendida por camada
   filters: { country: "all", usos: [...USO_ORDER], onlyNotion: false },
@@ -93,7 +94,14 @@ function attachNotion(features) {
 // ---------------------------------------------------------------------
 
 /** Garante que a camada está carregada e adicionada ao mapa. */
-export async function ensureLayer(key) {
+export function ensureLayer(key) {
+  if (state.loaded.has(key)) return Promise.resolve();
+  if (state.loading[key]) return state.loading[key];
+  state.loading[key] = doEnsureLayer(key).finally(() => { delete state.loading[key]; });
+  return state.loading[key];
+}
+
+async function doEnsureLayer(key) {
   if (state.loaded.has(key)) return;
   const map = state.map;
   const def = LAYERS.find((l) => l.key === key);
@@ -465,6 +473,7 @@ export async function reloadData() {
   }
 
   state.loaded.clear();
+  state.loading = {};
   state.data = {};
   buildReservoirHighlight();
 
