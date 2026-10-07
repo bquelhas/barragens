@@ -133,6 +133,9 @@ async function onMapReady(initial) {
   wireMapEvents();
   wireChrome();
 
+  // Hook de depuração opcional: basta acrescentar `?debug=1` ao URL.
+  if (new URLSearchParams(location.search).has("debug")) window.__map = map;
+
   // Estado inicial vindo do URL.
   if (initial.dam) openDamById(initial.dam, null);
 

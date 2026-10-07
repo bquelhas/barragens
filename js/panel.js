@@ -165,9 +165,17 @@ export function showDetail(dam) {
     const area = p.reservoir_area_ha != null ? ` (${fmtNumber(p.reservoir_area_ha)} ha)` : "";
     addRow("Albufeira", `${escapeHtml(p.reservoir_name)}${area}`);
   }
-  if (p.plant_names && p.plant_names.length) {
+  // Centrais associadas. Nota: o MapLibre devolve propriedades do tipo
+  // array como strings JSON (ex.: '["Grupo 4"]'), por isso interpretamos.
+  let plantNames = p.plant_names;
+  if (typeof plantNames === "string") {
+    try { plantNames = JSON.parse(plantNames); }
+    catch { plantNames = plantNames ? [plantNames] : []; }
+  }
+  if (!Array.isArray(plantNames)) plantNames = plantNames ? [String(plantNames)] : [];
+  if (plantNames.length) {
     const pw = p.plant_power_mw != null ? ` — ${fmtNumber(p.plant_power_mw)} MW` : "";
-    addRow("Centrais", `${p.plant_names.map(escapeHtml).join(", ")}${pw}`);
+    addRow("Centrais", `${plantNames.map(escapeHtml).join(", ")}${pw}`);
   }
   addRow("Volume", p.volume != null ? `${fmtNumber(p.volume)}` : null);
   addRow("Ref.", p.ref);
