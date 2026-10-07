@@ -148,19 +148,23 @@ async function onMapReady(initial) {
  * camadas sem recarregar a página (mantém o zoom e a barragem selecionada).
  */
 async function checkForUpdates() {
-  const fresh = await fetchJson(`${DATA.manifest}?t=${Date.now()}`, null);
-  if (!fresh || !fresh.generated_at || fresh.generated_at === lastGenerated) return;
+  try {
+    const fresh = await fetchJson(`${DATA.manifest}?t=${Date.now()}`, null);
+    if (!fresh || !fresh.generated_at || fresh.generated_at === lastGenerated) return;
 
-  lastGenerated = fresh.generated_at;
-  manifest = fresh;
-  notion = (await fetchJson(`${DATA.notion}?t=${Date.now()}`, {})) || {};
+    lastGenerated = fresh.generated_at;
+    manifest = fresh;
+    notion = (await fetchJson(`${DATA.notion}?t=${Date.now()}`, {})) || {};
 
-  layers.setNotion(notion);
-  await layers.reloadData();
-  search.setData(layers.allDams(), layers.allReservoirs());
-  panel.renderDataInfo(manifest);
-  showSampleBanner(manifest);
-  console.info("[dados] atualizados para", fresh.generated_at);
+    layers.setNotion(notion);
+    await layers.reloadData();
+    search.setData(layers.allDams(), layers.allReservoirs());
+    panel.renderDataInfo(manifest);
+    showSampleBanner(manifest);
+    console.info("[dados] atualizados para", fresh.generated_at);
+  } catch (err) {
+    console.warn("Falha ao recarregar dados novos:", err);
+  }
 }
 
 // ---------------------------------------------------------------------
