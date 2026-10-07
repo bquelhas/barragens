@@ -535,6 +535,14 @@ def run(countries: list[str], offline: bool, force: bool):
 
     log(f"[build] barragens agrupadas: {len(all_dams)}")
 
+    # Salvaguarda: uma extração que não trouxe nenhuma barragem é uma falha
+    # (Overpass indisponível), não deve substituir dados por vazio.
+    if not offline and not all_dams:
+        raise SystemExit(
+            "[validação] nenhuma barragem extraída — provável falha da Overpass. "
+            "A abortar sem commit."
+        )
+
     # -- Infraestrutura (à volta das barragens, por país) -----------------
     collect_map = {
         "plants": [{"filter": f, "ref": "dams",
