@@ -45,6 +45,11 @@ PBF_URLS = {
 }
 CACHE_DIR = Path(os.environ.get("OSM_CACHE", "/tmp/osm-cache"))
 
+# Índice de nós do pyosmium. `flex_mem` guarda tudo em RAM (rápido, usa mais
+# memória); para países grandes pode usar-se um índice em ficheiro, ex.:
+#   OSM_IDX="sparse_file_array,/tmp/osm-node.cache"
+OSM_IDX = os.environ.get("OSM_IDX") or "flex_mem"
+
 BASE = ["dams", "weirs", "reservoirs"]
 INFRA = ["plants", "substations", "power_lines", "conduits"]
 
@@ -196,10 +201,10 @@ def ensure_pbf(country: str) -> Path:
 
 def extract_country(country: str, layers: list[str]) -> dict[str, list]:
     pbf = ensure_pbf(country)
-    log(f"[pbf] {country}: a processar {pbf.name} (camadas: {', '.join(layers)})...")
+    log(f"[pbf] {country}: a processar {pbf.name} (camadas: {', '.join(layers)}; idx={OSM_IDX})...")
     t0 = time.time()
     handler = Extractor(layers, country)
-    handler.apply_file(str(pbf), locations=True)
+    handler.apply_file(str(pbf), locations=True, idx=OSM_IDX)
     log(f"[pbf] {country}: processado em {time.time()-t0:.0f}s")
     for layer, feats in handler.out.items():
         log(f"[pbf] {country}/{layer}: {len(feats)} elementos")

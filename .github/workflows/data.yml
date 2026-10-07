@@ -1,11 +1,14 @@
 name: Dados OSM (semanal)
 
 # Extrai os dados do OpenStreetMap e faz commit em `data/`, país a país.
+# Usa os extracts oficiais do Geofabrik (.osm.pbf) via pyosmium — é bem mais
+# fiável do que a Overpass API pública, que se satura com frequência.
+#
 # Cada país é commitado logo que termina, para o site ir mostrando os dados
 # à medida que ficam prontos (o site recarrega sozinho a cada minuto).
 #
 # Corre todas as segundas-feiras às 04:17 UTC; também pode ser lançado à mão
-# no separador "Actions" (Run workflow), escolhendo os países (ex.: "PT").
+# no separador "Actions" (Run workflow), escolhendo os países (ex.: "ES").
 
 on:
   schedule:
@@ -28,6 +31,8 @@ permissions:
 jobs:
   extrair:
     runs-on: ubuntu-latest
+    # Alguma memória/espaco para o índice de nós de Espanha (~1,5 GB de .pbf).
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +48,9 @@ jobs:
 
       - name: Extrair (país a país) e commit
         shell: bash
+        env:
+          # Índice de nós em ficheiro: usa muito menos RAM (países grandes).
+          OSM_IDX: "sparse_file_array,/tmp/osm-node.cache"
         run: |
           set -e
           git config user.name "github-actions[bot]"
@@ -55,17 +63,16 @@ jobs:
           for cc in "${CC_LIST[@]}"; do
             cc="$(echo "$cc" | tr -d ' ' | tr '[:lower:]' '[:upper:]')"
             echo "========== Extração de $cc =========="
-            # Se a extração falhar (ou tiver poucas barragens), o script sai
-            # com erro e este país não é commitado — os dados bons mantêm-se.
-            python scripts/build_data.py --countries "$cc"
+            # Se a extração falhar, este país não é commitado — os dados bons
+            # anteriores mantêm-se.
+            python scripts/build_data_pbf.py --countries "$cc"
 
             git add data/
             if git diff --cached --quiet; then
               echo "Sem alterações nos dados de $cc."
             else
               git commit -m "dados: extração $cc $(date -u +%Y-%m-%dT%H:%MZ)"
-              # Pode haver commits novos no remoto (ex.: outra execução ou
-              # edições manuais): integra antes de enviar.
+              # Integra commits novos do remoto antes de enviar.
               git pull --rebase --autostash origin main
               git push
               echo "Commit de $cc publicado."

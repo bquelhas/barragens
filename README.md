@@ -55,9 +55,10 @@ requirements.txt               Dependências Python
 
 ## 3. Como funcionam os dados
 
-1. `scripts/build_data.py` vai buscar ao **OpenStreetMap** (API Overpass) as
-   barragens, albufeiras, açudes e — num raio de 3 km — centrais, subestações,
-   linhas elétricas e condutas.
+1. `scripts/build_data.py` (Overpass) ou `scripts/build_data_pbf.py` (extracts
+   do Geofabrik, o método usado pela GitHub Action) vão buscar ao
+   **OpenStreetMap** as barragens, albufeiras, açudes e — num raio de 3 km —
+   centrais, subestações, linhas elétricas e condutas.
 2. Associa cada barragem à sua **albufeira** e às **centrais** mais próximas e
    classifica o **uso**: `hidroelétrica`, `regadio`, `abastecimento`, `misto`
    ou `desconhecido`.
@@ -221,7 +222,7 @@ python scripts/fetch_notion.py --dry-run  # só valida, sem escrever
 
 | Workflow | Quando corre | O que faz |
 | --- | --- | --- |
-| **Dados OSM (semanal)** | Segundas, 04:17 UTC (+ manual) | Regenera `data/*.geojson` e faz commit |
+| **Dados OSM (semanal)** | Segundas, 04:17 UTC (+ manual) | Regenera `data/*.geojson` a partir dos extracts do **Geofabrik (.pbf)** e faz commit, país a país |
 | **Dados Notion (a cada hora)** | De hora a hora (+ manual) | Atualiza `data/notion.json` |
 | **Publicar no GitHub Pages** | A cada `push` em `main` (+ manual) | Publica o site |
 
