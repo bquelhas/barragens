@@ -108,10 +108,11 @@ async function onMapReady(initial) {
     onLayerToggle: (key, visible) => layers.setVisibility(key, visible),
     onListSort: (field) => discover.setSort(field),
     onListShow: () => discover.refreshList(),
+    onOpenDamById: (damId) => openDamById(damId, null),
   });
   search.initSearch({
     onSelectDam: (damId, coords) => openDamById(damId, coords),
-    onSelectReservoir: (coords) => flyTo(coords),
+    onSelectReservoir: (item) => openReservoir(item),
   });
   layers.init({ map, manifest, notion });
 
@@ -175,14 +176,18 @@ function wireMapEvents() {
     map.on("mouseenter", "dams-points", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "dams-points", () => (map.getCanvas().style.cursor = ""));
   }
+  if (map.getLayer("reservoirs-fill")) {
+    map.on("mouseenter", "reservoirs-fill", () => (map.getCanvas().style.cursor = "pointer"));
+    map.on("mouseleave", "reservoirs-fill", () => (map.getCanvas().style.cursor = ""));
+  }
 
-  // Um único handler de clique: barragem sob o cursor OU a mais próxima
-  // (para garantir que continua clicável mesmo com ícones sobrepostos).
+  // Um único handler de clique. Prioridade: cluster > barragem > albufeira >
+  // barragem mais próxima (garante que continua clicável com ícones sobrepostos).
   map.on("click", (e) => {
-    const queryLayers = ["dams-points", "dams-clusters"].filter((id) => map.getLayer(id));
-    const hits = queryLayers.length ? map.queryRenderedFeatures(e.point, { layers: queryLayers }) : [];
-    if (hits.length) {
-      const f = hits[0];
+    const damLayers = ["dams-points", "dams-clusters"].filter((id) => map.getLayer(id));
+    const damHits = damLayers.length ? map.queryRenderedFeatures(e.point, { layers: damLayers }) : [];
+    if (damHits.length) {
+      const f = damHits[0];
       if (f.layer.id === "dams-clusters") {
         map.getSource(layers.damsSourceId).getClusterExpansionZoom(f.properties.cluster_id)
           .then((zoom) => map.easeTo({ center: f.geometry.coordinates, zoom })).catch(() => {});
@@ -191,6 +196,10 @@ function wireMapEvents() {
       openDam(f);
       return;
     }
+    const resLayers = ["reservoirs-fill", "reservoirs-outline"].filter((id) => map.getLayer(id));
+    const resHits = resLayers.length ? map.queryRenderedFeatures(e.point, { layers: resLayers }) : [];
+    if (resHits.length) { openReservoirProps(resHits[0].properties); return; }
+
     const near = nearestDam(e.point, 22);
     if (near) openDam(near);
     else closeDetail();
@@ -310,6 +319,22 @@ async function openDamById(damId, coords) {
 function closeDetail() {
   panel.hideDetail();
   layers.clearSelection();
+  discover.markSelected(null);
+  writeHash();
+}
+
+/** Abre a ficha de uma albufeira (ou da barragem associada, se existir). */
+function openReservoir(item) {
+  if (item.coords) flyTo(item.coords);
+  if (item.damId) { openDamById(item.damId, null); return; }
+  const feature = layers.allReservoirs().find((r) => r.properties.reservoir_id === item.reservoirId);
+  openReservoirProps({ name: item.name, reservoir_id: item.reservoirId, ...(feature?.properties || {}) });
+}
+
+function openReservoirProps(props) {
+  if (props.dam_id) { openDamById(props.dam_id, null); return; }
+  layers.selectDam(null, props.reservoir_id);
+  panel.showReservoir(props);
   discover.markSelected(null);
   writeHash();
 }

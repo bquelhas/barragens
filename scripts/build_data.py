@@ -393,6 +393,31 @@ def associate(dams: list[dict], reservoirs: list[dict], plants: list[dict]):
 # Albufeiras: ligação à barragem e filtragem
 # ---------------------------------------------------------------------------
 
+def filter_dams(dams: list[dict]) -> list[dict]:
+    """
+    Descarta barragens **sem nome**, **sem albufeira** e **sem central**
+    associada quando a estrutura é minúscula (< `MIN_DAM_SIZE_M`). São
+    tipicamente levadas, pequenos açudes ou ruído do OSM.
+    """
+    kept = []
+    dropped = 0
+    for d in dams:
+        tags = d["tags"]
+        named = bool(tags.get("name") or tags.get("name:pt") or tags.get("name:es"))
+        if named or d.get("reservoir_id") or d.get("plant_ids"):
+            kept.append(d)
+            continue
+        m = geo.to_metric(d["geom"])
+        size = m.length if m.geom_type in ("LineString", "MultiLineString") else m.area
+        if size < config.MIN_DAM_SIZE_M:
+            dropped += 1
+        else:
+            kept.append(d)
+    if dropped:
+        log(f"[barragens] {dropped} estruturas minúsculas sem nome descartadas")
+    return kept
+
+
 def link_and_filter_reservoirs(reservoirs: list[dict], dams: list[dict]) -> list[dict]:
     """
     Liga cada albufeira à sua barragem (propriedade `dam_id`) e filtra as
@@ -685,6 +710,7 @@ def run(countries: list[str], offline: bool, force: bool, skip_infra: bool = Fal
     # -- Associação espacial ---------------------------------------------
     log("[build] a associar albufeiras e centrais às barragens...")
     associate(all_dams, all_reservoirs, all_plants)
+    all_dams = filter_dams(all_dams)
     all_reservoirs = link_and_filter_reservoirs(all_reservoirs, all_dams)
 
     # -- Filtragem fina das infraestruturas ------------------------------

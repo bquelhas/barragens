@@ -9,7 +9,7 @@ let dom = {};
 let hooks = {};
 let currentFilters = { country: "all", usos: [...USO_ORDER], onlyNotion: false };
 
-export function initPanel({ map, manifest, onFiltersChange, onLayerToggle, onListSort }) {
+export function initPanel({ map, manifest, onFiltersChange, onLayerToggle, onListSort, onListShow, onOpenDamById }) {
   dom = {
     drawer: document.getElementById("drawer"),
     layerList: document.getElementById("layer-list"),
@@ -23,7 +23,7 @@ export function initPanel({ map, manifest, onFiltersChange, onLayerToggle, onLis
     drawerClose: document.getElementById("drawer-close"),
     listSort: document.getElementById("list-sort"),
   };
-  hooks = { onFiltersChange, onLayerToggle, onListSort };
+  hooks = { onFiltersChange, onLayerToggle, onListSort, onListShow, onOpenDamById };
 
   buildLayerList(manifest);
   buildUsoFilters();
@@ -286,6 +286,32 @@ export function hideDetail() {
 /** Define a posição da ficha no telemóvel (collapsed/half/full). */
 export function setSheet(state) {
   if (dom.detail) dom.detail.dataset.sheet = state;
+}
+
+export function showReservoir(p) {
+  const name = p.name || p.name_pt || p.name_es || "Albufeira sem nome";
+  const usage = p.usage || p.reservoir_type || null;
+  const facts = [];
+  if (p.area_ha != null) facts.push(`<div class="fact"><div class="k">Área</div><div class="v">${fmtNumber(p.area_ha)} ha</div></div>`);
+  if (p.dam_id) facts.push(`<div class="fact"><div class="k">Barragem</div><div class="v">associada</div></div>`);
+
+  dom.detailBody.innerHTML = `
+    <div class="ficha-hero"><div class="hero-fallback">${heroSvg(PALETTE.water)}</div></div>
+    <div class="ficha-body">
+      <h2 class="ficha-title">${escapeHtml(name)}</h2>
+      <div class="chips">
+        <span class="chip">${escapeHtml(p.country || "")}</span>
+        <span class="chip uso" style="background:${PALETTE.water}">Albufeira</span>
+        ${usage ? `<span class="chip">${escapeHtml(usage)}</span>` : ""}
+      </div>
+      ${facts.length ? `<div class="facts">${facts.join("")}</div>` : ""}
+      ${p.dam_id
+        ? `<button class="btn primary block" id="res-dam" type="button">Ver a barragem</button>`
+        : `<p class="muted small">Sem barragem associada no OpenStreetMap.</p>`}
+    </div>`;
+  dom.detail.hidden = false;
+  if (matchMedia("(max-width: 780px)").matches) setSheet("half");
+  document.getElementById("res-dam")?.addEventListener("click", () => hooks.onOpenDamById?.(p.dam_id));
 }
 
 /** Mostra a data dos dados + contagens (usado no ecrã de boas-vindas). */

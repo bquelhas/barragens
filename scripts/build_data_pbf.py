@@ -266,6 +266,7 @@ def run(countries, skip_infra, force):
 
     log("[build] a associar albufeiras e centrais às barragens...")
     build_data.associate(all_dams, all_reservoirs, all_plants)
+    all_dams = build_data.filter_dams(all_dams)
     all_reservoirs = build_data.link_and_filter_reservoirs(all_reservoirs, all_dams)
 
     if not skip_infra:

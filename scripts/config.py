@@ -166,6 +166,11 @@ SIMPLIFY_TOLERANCE_M = {
 # (descarta charcas e tanques que engordavam a camada sem utilidade)
 MIN_RESERVOIR_AREA_HA = 5.0
 
+# Barragens sem nome e sem albufeira/central associada só se mantêm se a
+# estrutura tiver um tamanho mínimo (metros de linha ou m² de área) —
+# descarta estruturas minúsculas (levadas, pequenos açudes sem nome).
+MIN_DAM_SIZE_M = 15.0
+
 COORD_DECIMALS = 5  # arredondamento das coordenadas (~1 m)
 
 # Geometrias degeneradas (área/comprimento ~0) são descartadas. O

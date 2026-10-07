@@ -51,7 +51,7 @@ export function setData(dams, reservoirs) {
     const p = r.properties || {};
     for (const n of new Set([p.name, p.name_pt, p.name_es].filter(Boolean))) {
       const c = centroid(r.geometry);
-      if (c) push("reservoir", n, c, {});
+      if (c) push("reservoir", n, c, { reservoirId: p.reservoir_id, damId: p.dam_id || null });
     }
   }
 }
@@ -143,6 +143,6 @@ function choose(i) {
   if (item.type === "dam" || item.type === "rio") {
     hooks.onSelectDam(item.damId, item.coords);
   } else {
-    hooks.onSelectReservoir(item.coords);
+    hooks.onSelectReservoir(item);
   }
 }
