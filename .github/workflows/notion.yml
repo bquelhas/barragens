@@ -1,7 +1,11 @@
-name: Dados Notion (a cada hora)
+name: Dados Notion (diário)
 
 # Atualiza apenas `data/notion.json` (links para as páginas do Notion),
-# independentemente da extração OSM. Corre de hora a hora e também à mão.
+# independentemente da extração OSM. Corre uma vez por dia (05:37 UTC) e
+# também à mão. Se editares o Notion e quiseres ver já, usa "Run workflow".
+#
+# Nota: as capas carregadas NO Notion expiram (~1 h); correr mais vezes não
+# resolve isso — o estável é usar URLs externas para as fotos.
 #
 # Segredos necessários (Settings -> Secrets and variables -> Actions):
 #   NOTION_TOKEN         token da integração do Notion
@@ -10,7 +14,7 @@ name: Dados Notion (a cada hora)
 
 on:
   schedule:
-    - cron: "7 * * * *"
+    - cron: "37 5 * * *"
   workflow_dispatch:
 
 concurrency:

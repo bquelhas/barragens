@@ -204,7 +204,7 @@ O objetivo: cada barragem do mapa pode mostrar uma foto e um botão
 2. Cria duas entradas:
    * `NOTION_TOKEN` → o token da integração.
    * `NOTION_DATABASE_ID` → o ID da base de dados.
-3. Pronto. O workflow **"Dados Notion (a cada hora)"** vai gerar
+3. Pronto. O workflow **"Dados Notion (diário)"** vai gerar
    `data/notion.json` automaticamente. Podes também lançá-lo à mão no
    separador **Actions** (*Run workflow*).
 
@@ -225,7 +225,7 @@ python scripts/fetch_notion.py --dry-run  # só valida, sem escrever
 | Workflow | Quando corre | O que faz |
 | --- | --- | --- |
 | **Dados OSM (semanal)** | Segundas, 04:17 UTC (+ manual) | Regenera `data/*.geojson` a partir dos extracts do **Geofabrik (.pbf)** e faz commit, país a país |
-| **Dados Notion (a cada hora)** | De hora a hora (+ manual) | Atualiza `data/notion.json` |
+| **Dados Notion (diário)** | Diariamente, 05:37 UTC (+ manual) | Atualiza `data/notion.json` |
 | **Publicar no GitHub Pages** | A cada `push` em `main` (+ manual) | Publica o site |
 
 Podes mudar as frequências editando as linhas `cron:` nos ficheiros em
