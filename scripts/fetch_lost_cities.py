@@ -114,6 +114,23 @@ def slug(text: str) -> str:
     return norm or "sem-nome"
 
 
+# Código de tipo no início do título do Notion: `AS` = Aldeia submersa,
+# `BN` = Bairro novo (ex.: "AS Venda Nova", "BN Salamonde"). É só um marcador
+# de tipo — `Tipo_objeto` já o diz e a ficha já o mostra — por isso sai do nome
+# que vai para o mapa. Exige maiúsculas e um separador (ou o fim do título),
+# para não cortar topónimos que comecem por "As…"/"Bn…".
+_TITLE_CODE_RE = re.compile(r"^(?:AS|BN)(?:[\s\-–—:.]+|$)")
+
+
+def clean_title(title: str | None) -> str:
+    """Tira o código de tipo (`AS `/`BN `) do início do título."""
+    text = (title or "").strip()
+    if not text:
+        return text
+    stripped = _TITLE_CODE_RE.sub("", text, count=1).strip()
+    return stripped or text
+
+
 def _year(value: str) -> str:
     m = re.search(r"\b(1[89]\d{2}|20\d{2})\b", value or "")
     return m.group(1) if m else ""
@@ -192,7 +209,7 @@ def record_from_page(page: dict) -> dict:
     return {
         "page_id": page.get("id"),
         "url": page.get("url"),
-        "name": prop_text(_prop(props, P_TITLE)) or "(sem título)",
+        "name": clean_title(prop_text(_prop(props, P_TITLE))) or "(sem título)",
         "tipo_objeto": prop_text(_prop(props, P_TIPO_OBJ)),
         "camadas": prop_list(_prop(props, P_CAMADAS)),
         "coordenadas": prop_text(_prop(props, P_COORD)) or prop_text(_prop(props, P_LOCALIZACAO)),
@@ -253,7 +270,7 @@ def load_from_api() -> list[dict]:
     if pages:
         log(f"[notion] propriedades da base: {sorted(pages[0].get('properties', {}).keys())}")
     # índices id -> título / id -> OSM (para resolver relações)
-    id_to_title = {p["id"]: prop_text(p.get("properties", {}).get(P_TITLE)) for p in pages}
+    id_to_title = {p["id"]: clean_title(prop_text(p.get("properties", {}).get(P_TITLE))) for p in pages}
     id_to_osm = {p["id"]: prop_text(p.get("properties", {}).get(P_OSM)) for p in pages}
     records = []
     for p in pages:
@@ -277,12 +294,12 @@ _KEY_RE = re.compile(r"^(" + "|".join(re.escape(k) for k in EXPORT_KEYS) + r"):\
 
 
 def _related_titles_from_text(value: str) -> list[str]:
-    """'Aguieira (path.md), AS Foz do Dão (path.md)' -> ['Aguieira', 'AS Foz do Dão']."""
+    """'Aguieira (path.md), AS Foz do Dão (path.md)' -> ['Aguieira', 'Foz do Dão']."""
     out = []
     for part in re.split(r",\s*(?=[^)]*(?:\(|$))", value or ""):
         title = part.split(" (")[0].strip()
         if title:
-            out.append(title)
+            out.append(clean_title(title))
     return out
 
 
@@ -323,7 +340,7 @@ def load_from_export(dirpath: str) -> list[dict]:
         records.append({
             "page_id": None,
             "url": None,
-            "name": title,
+            "name": clean_title(title),
             "tipo_objeto": joined.get(P_TIPO_OBJ, ""),
             "camadas": [x.strip() for x in joined.get(P_CAMADAS, "").split(",") if x.strip()],
             "coordenadas": joined.get(P_COORD, ""),

@@ -206,6 +206,11 @@ Quando a geocodificação é fraca, **ancora** o ponto na barragem-mãe e escrev
 uma `ressalva`. Gera `data/submersos_notion.geojson` e
 `data/bairros_notion.geojson` e atualiza o manifest (sem depender de `shapely`).
 
+O título das páginas pode trazer um **código de tipo** no início — `AS`
+(aldeia submersa) ou `BN` (bairro novo), ex. `AS Venda Nova`. É ignorado: o
+nome que vai para o mapa fica só «Venda Nova» (o tipo já vem de `Tipo_objeto`
+e é mostrado na ficha).
+
 ### `build_pois.py`
 
 Obtém a geometria real dos POIs curados (lista `POIS` em `config.py`) via

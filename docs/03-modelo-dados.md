@@ -130,6 +130,9 @@ uma `ressalva` escrita pelo geocodificador, e trazem ainda `dam_id` — o `dam_i
 da barragem-mãe, resolvido a partir do campo **`OSM`** da página ligada (para o
 cartão da barragem poder listá-los).
 
+O `name` vem do título da página **sem o código de tipo inicial** (`AS` = aldeia
+submersa, `BN` = bairro novo): «AS Venda Nova» fica «Venda Nova».
+
 ## 3. `notion.json`
 
 Mapa `dam_id → metadados da página`. Vazio (`{}`) quando o Notion não está
