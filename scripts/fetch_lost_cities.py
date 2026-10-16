@@ -579,9 +579,20 @@ def emit(records: list[dict], cache: dict, allow_network: bool, dry_run: bool) -
 
     if not dry_run:
         save_cache(cache)
-        write_geojson(config.DATA_DIR / "submersos_notion.geojson", buckets[SUBMERSO])
-        write_geojson(config.DATA_DIR / "bairros_notion.geojson", buckets[BAIRRO])
-        update_manifest([SUBMERSO, BAIRRO])
+        escritos = []
+        # Salvaguarda: nunca substituir um ficheiro com pontos por um vazio
+        # (ex.: porque o campo `Coordenadas` ficou sem valores na base).
+        for kind, fname in ((SUBMERSO, "submersos_notion.geojson"),
+                            (BAIRRO, "bairros_notion.geojson")):
+            existentes = count_features(fname)
+            if not buckets[kind] and existentes:
+                log(f"[{kind}] aviso: 0 pontos novos — mantenho o ficheiro "
+                    f"existente ({existentes}). Verifica o campo «{P_COORD}» na base.")
+                continue
+            write_geojson(config.DATA_DIR / fname, buckets[kind])
+            escritos.append(fname)
+        if escritos:
+            update_manifest([SUBMERSO, BAIRRO])
 
     for kind, features in buckets.items():
         log(f"[{kind}] {len(features)} pontos"

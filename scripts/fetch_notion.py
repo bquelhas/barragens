@@ -253,6 +253,20 @@ def main():
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+
+    # Salvaguarda: não substituir um notion.json com conteúdo por um vazio.
+    if not index:
+        existentes = 0
+        if out.exists():
+            try:
+                existentes = len(json.loads(out.read_text(encoding="utf-8")))
+            except Exception:  # noqa: BLE001
+                existentes = 0
+        if existentes:
+            log(f"[notion] aviso: 0 barragens resolvidas — mantenho o "
+                f"notion.json existente ({existentes}).")
+            return
+
     with out.open("w", encoding="utf-8") as fh:
         json.dump(index, fh, ensure_ascii=False, indent=2, sort_keys=True)
     log(f"[notion] escrito {out} (atualizado {datetime.now(timezone.utc).isoformat(timespec='seconds')})")
