@@ -114,10 +114,17 @@ Estado interno (`state`): `loaded`, `loading`, `data`, `visible`, `filters`,
 
 ### Filtros (`applyFilters`)
 
-Aplicam-se às **barragens individuais** via `setFilter`:
+Aplicam-se às **barragens individuais** e às **formas** via `setFilter`:
 
 - país (`country`), uso (`uso ∈ usos`) e "só com Notion" (`has notion_url`).
-- O mesmo filtro replica-se aos contornos (`dam_geoms-*`).
+- As formas que pertencem a uma barragem seguem o mesmo filtro: contornos
+  (`dam_geoms-*`) e **albufeiras** (`reservoirs-fill`/`reservoirs-outline`).
+  Para isso, `linkToDams` copia `uso` e `notion_url` da barragem associada
+  (`dam_id`) para as feições dessas camadas, no carregamento.
+- As albufeiras **sem** barragem associada ficam com `uso = "desconhecido"`
+  (aparecem quando esse uso está selecionado).
+- Os destaques de seleção (`reservoirs-highlight*`) e a rede relacionada não
+  são filtrados.
 
 ### Seleção e destaques
 

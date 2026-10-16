@@ -310,6 +310,7 @@ async function loadLayerData(key) {
   }
 
   if (key === "dams") { attachNotion(features); computeDamSizes(features); buildFidIndex(features); }
+  if (key === "dam_geoms" || key === "reservoirs") linkToDams(features);
   state.data[key] = features;
   return { type: "FeatureCollection", features };
 }
@@ -339,6 +340,29 @@ function attachNotion(features) {
       f.properties.notion_foto = meta.foto_capa || null;
       f.properties.notion_resumo = meta.resumo || null;
     }
+  }
+}
+
+/**
+ * Copia para as formas que pertencem a uma barragem (o contorno e a albufeira)
+ * os atributos que os filtros usam — `uso` e `notion_url` — para os filtros
+ * valerem também para elas. As barragens são carregadas primeiro (ordem de
+ * `LAYERS`) e já com o Notion ligado.
+ *
+ * Sem isto, as albufeiras ignoravam por completo o país/uso/Notion, e o
+ * contorno das barragens desaparecia com o filtro «Só com página Notion».
+ */
+function linkToDams(features) {
+  const byDam = new Map();
+  for (const f of state.data.dams || []) byDam.set(f.properties?.dam_id, f.properties);
+  for (const f of features) {
+    const p = f.properties;
+    if (!p) continue;
+    const dam = p.dam_id ? byDam.get(p.dam_id) : null;
+    // Albufeira sem barragem associada fica sem uso conhecido, tal como as
+    // barragens sem tags de uso.
+    p.uso = dam?.uso || p.uso || "desconhecido";
+    if (dam?.notion_url) p.notion_url = dam.notion_url;
   }
 }
 
@@ -653,10 +677,13 @@ export function applyFilters(filters) {
     map.setLayoutProperty("dams-cluster-count", "text-field", ["to-string", ["get", "point_count"]]);
   }
 
-  const outlineConds = countryUsoNotionConds(filters);
-  const outlineFilter = outlineConds.length ? ["all", ...outlineConds] : null;
-  for (const id of ["dam_geoms-line", "dam_geoms-fill"]) {
-    if (map.getLayer(id)) map.setFilter(id, outlineFilter);
+  // As manchas (albufeiras) e os contornos das barragens seguem o mesmo filtro
+  // dos pontos: país, uso da barragem e se a barragem tem página Notion.
+  const shapeConds = countryUsoNotionConds(filters);
+  const shapeFilter = shapeConds.length ? ["all", ...shapeConds] : null;
+  for (const id of ["dam_geoms-line", "dam_geoms-fill",
+                    "reservoirs-fill", "reservoirs-outline"]) {
+    if (map.getLayer(id)) map.setFilter(id, shapeFilter);
   }
 }
 
