@@ -114,15 +114,37 @@ Estado interno (`state`): `loaded`, `loading`, `data`, `visible`, `filters`,
 
 ### Filtros (`applyFilters`)
 
-Aplicam-se às **barragens individuais** e às **formas** via `setFilter`:
+Três eixos, aplicados por `setFilter`: país (`country`), uso (`uso ∈ usos`, quando
+nem todos os usos estão activos) e "só com Notion" (`has notion_url`). Cada camada
+recebe a combinação que lhe compete:
 
-- país (`country`), uso (`uso ∈ usos`) e "só com Notion" (`has notion_url`).
-- As formas que pertencem a uma barragem seguem o mesmo filtro: contornos
-  (`dam_geoms-*`) e **albufeiras** (`reservoirs-fill`/`reservoirs-outline`).
-  Para isso, `linkToDams` copia `uso` e `notion_url` da barragem associada
-  (`dam_id`) para as feições dessas camadas, no carregamento.
-- As albufeiras **sem** barragem associada ficam com `uso = "desconhecido"`
-  (aparecem quando esse uso está selecionado).
+| Grupo | Camadas | Filtro aplicado |
+| --- | --- | --- |
+| Barragens | `dams-points`, `dams-selected`, `dams-notion` | país + uso + Notion |
+| Pertencem a uma barragem (`DAM_LAYERS`) | `dam_geoms-line/-fill`, `reservoirs-fill/-outline`, `plants-point`, `submersos-point/-label`, `bairros-point/-label` | país + uso + Notion |
+| Infraestrutura auxiliar (`COUNTRY_LAYERS`) | `weirs-point`, `substations-point`, `power_lines-line`, `conduits-line` | só país |
+
+- **Ligação à barragem (`linkToDams`).** As feições das camadas do 2.º grupo não
+trazem por si os atributos que os filtros usam, logo recebem-nos da barragem
+associada: por `dam_id` (contornos, albufeiras, povoados do Notion), pelos
+`plant_ids` da barragem (**centrais**, que não têm `dam_id`) ou pelo **nome** da
+barragem (povoados curados, que só trazem `barragem`; também o `pais` sobe para
+`country`). O índice é `damIndex()` (por `dam_id`, por central e por nome) e é
+reconstruído só quando os dados das barragens mudam.
+- **Ordem obrigatória — antes de criar a fonte.** O MapLibre gera as *tiles* de
+  uma fonte GeoJSON **uma só vez**, quando o `data` é definido, e não volta a ver
+  propriedades acrescentadas depois. Por isso `linkToDams` corre em
+  `doEnsureLayer`, **antes** de `addGeneric`/`addDams` criarem a fonte. Ligar
+  depois (como no `applyFilters`) não chega: as *tiles* já não têm os atributos e
+  os filtros nunca encontram nada.
+- **Camadas sem barragem.** Uma albufeira ou central sem barragem associada fica
+  com `uso = "desconhecido"` (tal como as barragens sem tags de uso) e só aparece
+  quando esse uso está selecionado; a infraestrutura auxiliar segue apenas o país.
+- **Nomes ambíguos.** `damKey` normaliza (sem acentos, sem prefixos
+  `barragem`/`albufeira`/`encoro`/`embalse`, pontuação→espaço) e o índice dá
+  prioridade ao **nome próprio** da barragem; só depois ao `reservoir_name`. Numa
+  cascata de barragens a albufeira pode ter o nome da barragem seguinte — ver
+  `docs/06-notion.md`.
 - Os destaques de seleção (`reservoirs-highlight*`) e a rede relacionada não
   são filtrados.
 

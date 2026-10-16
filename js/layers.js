@@ -27,6 +27,21 @@ const state = {
 
 export const damsSourceId = "src-dams";
 
+// Camadas cujas feições pertencem a uma barragem (chave dos dados → ids no mapa).
+// Seguem os filtros de país, uso e Notion — os atributos que faltam são
+// copiados das barragens por `linkToDams`, **antes** de a fonte ser criada.
+const DAM_LAYERS = [
+  ["dam_geoms", ["dam_geoms-line", "dam_geoms-fill"]],
+  ["reservoirs", ["reservoirs-fill", "reservoirs-outline"]],
+  ["plants", ["plants-point"]],
+  ["submersos", ["submersos-point", "submersos-label"]],
+  ["bairros", ["bairros-point", "bairros-label"]],
+];
+const DAM_LAYER_KEYS = new Set(DAM_LAYERS.map(([k]) => k));
+
+// Infraestrutura auxiliar: segue só o país (não tem uso nem barragem associada).
+const COUNTRY_LAYERS = ["weirs-point", "substations-point", "power_lines-line", "conduits-line"];
+
 // ---------------------------------------------------------------------
 // Inicialização
 // ---------------------------------------------------------------------
@@ -310,7 +325,6 @@ async function loadLayerData(key) {
   }
 
   if (key === "dams") { attachNotion(features); computeDamSizes(features); buildFidIndex(features); }
-  if (key === "dam_geoms" || key === "reservoirs") linkToDams(features);
   state.data[key] = features;
   return { type: "FeatureCollection", features };
 }
@@ -344,25 +358,66 @@ function attachNotion(features) {
 }
 
 /**
- * Copia para as formas que pertencem a uma barragem (o contorno e a albufeira)
- * os atributos que os filtros usam — `uso` e `notion_url` — para os filtros
- * valerem também para elas. As barragens são carregadas primeiro (ordem de
- * `LAYERS`) e já com o Notion ligado.
- *
- * Sem isto, as albufeiras ignoravam por completo o país/uso/Notion, e o
- * contorno das barragens desaparecia com o filtro «Só com página Notion».
+ * Índice das barragens para os filtros: por `dam_id`, por central (`plant_ids`
+ * da barragem — as centrais não trazem `dam_id`) e por nome. Reconstruído só
+ * quando os dados das barragens mudam.
  */
-function linkToDams(features) {
-  const byDam = new Map();
-  for (const f of state.data.dams || []) byDam.set(f.properties?.dam_id, f.properties);
+let damIdx = { data: null, byId: null, byPlant: null, byName: null };
+
+function damIndex() {
+  const dams = state.data.dams || [];
+  if (damIdx.data === dams) return damIdx;
+  const byId = new Map(), byPlant = new Map(), byName = new Map();
+  for (const f of dams) {
+    const p = f.properties;
+    if (!p) continue;
+    byId.set(p.dam_id, p);
+    let pids = p.plant_ids;
+    if (typeof pids === "string") { try { pids = JSON.parse(pids); } catch { pids = []; } }
+    for (const pid of pids || []) byPlant.set(pid, p);
+  }
+  // Nomes próprios primeiro; só depois os nomes das albufeiras (numa cascata de
+  // barragens a albufeira pode ter o nome da barragem seguinte — ver
+  // `docs/06-notion.md`).
+  for (const campo of ["name", "name_pt", "name_es"]) {
+    for (const f of dams) {
+      const key = damKey(f.properties?.[campo]);
+      if (key && !byName.has(key)) byName.set(key, f.properties);
+    }
+  }
+  for (const f of dams) {
+    const key = damKey(f.properties?.reservoir_name);
+    if (key && !byName.has(key)) byName.set(key, f.properties);
+  }
+  damIdx = { data: dams, byId, byPlant, byName };
+  return damIdx;
+}
+
+/**
+ * Liga às feições que pertencem a uma barragem (contorno, albufeira, central,
+ * povoado) os atributos que os filtros usam — `uso` e, se ainda não tiverem,
+ * `notion_url` — para os filtros valerem também para elas.
+ *
+ * A ligação é por `dam_id` (contornos, albufeiras, povoados do Notion), pelos
+ * `plant_ids` da barragem (centrais) ou pelo nome da barragem (povoados curados,
+ * que só trazem `barragem`). O país das camadas curadas vem em `pais`.
+ *
+ * Sem isto, as albufeiras e as centrais ignoravam por completo país/uso/Notion,
+ * e o contorno das barragens desaparecia com o filtro «Só com página Notion».
+ */
+function linkToDams(features, layerKey) {
+  const { byId, byPlant, byName } = damIndex();
   for (const f of features) {
     const p = f.properties;
     if (!p) continue;
-    const dam = p.dam_id ? byDam.get(p.dam_id) : null;
-    // Albufeira sem barragem associada fica sem uso conhecido, tal como as
-    // barragens sem tags de uso.
+    let dam = p.dam_id ? byId.get(p.dam_id) : null;
+    if (!dam && layerKey === "plants") dam = byPlant.get(`${p.osm_type}/${p.osm_id}`);
+    if (!dam && p.barragem) dam = byName.get(damKey(p.barragem));
+    if (!p.country && p.pais) p.country = p.pais;
+    // Albufeira/central sem barragem associada fica sem uso conhecido, tal como
+    // as barragens sem tags de uso.
     p.uso = dam?.uso || p.uso || "desconhecido";
-    if (dam?.notion_url) p.notion_url = dam.notion_url;
+    if (dam?.notion_url && !p.notion_url) p.notion_url = dam.notion_url;
   }
 }
 
@@ -396,8 +451,18 @@ async function doEnsureLayer(key) {
   const map = state.map;
   const def = LAYERS.find((l) => l.key === key);
   if (!def) return;
+
+  // As barragens definem `uso`/`notion_url` das restantes camadas (ver
+  // `linkToDams`): se ainda não estiverem carregadas, carregar primeiro.
+  if (DAM_LAYER_KEYS.has(key) && !state.loaded.has("dams")) await ensureLayer("dams");
+
   const fc = await loadLayerData(key);
   if (!fc) return;
+
+  // Antes de criar a fonte: o MapLibre gera as *tiles* do GeoJSON uma só vez, no
+  // momento em que o `data` é definido, e não volta a ver propriedades
+  // acrescentadas depois — os filtros deixariam de as encontrar.
+  if (DAM_LAYER_KEYS.has(key)) linkToDams(fc.features, key);
 
   state.loaded.add(key);
   if (key === "dams") { await ensureDamIcons(); addDams(fc); }
@@ -677,19 +742,26 @@ export function applyFilters(filters) {
     map.setLayoutProperty("dams-cluster-count", "text-field", ["to-string", ["get", "point_count"]]);
   }
 
-  // As manchas (albufeiras) e os contornos das barragens seguem o mesmo filtro
-  // dos pontos: país, uso da barragem e se a barragem tem página Notion.
-  const shapeConds = countryUsoNotionConds(filters);
-  const shapeFilter = shapeConds.length ? ["all", ...shapeConds] : null;
-  for (const id of ["dam_geoms-line", "dam_geoms-fill",
-                    "reservoirs-fill", "reservoirs-outline"]) {
-    if (map.getLayer(id)) map.setFilter(id, shapeFilter);
+  // Camadas que pertencem a uma barragem: país, uso e Notion (os atributos
+  // foram copiados em `linkToDams`, antes de a fonte ser criada).
+  const ctxConds = countryUsoNotionConds(filters);
+  const ctxFilter = ctxConds.length ? ["all", ...ctxConds] : null;
+  for (const [, ids] of DAM_LAYERS) {
+    for (const id of ids) if (map.getLayer(id)) map.setFilter(id, ctxFilter);
   }
+
+  const cc = countryConds(filters);
+  const countryFilter = cc.length ? ["all", ...cc] : null;
+  for (const id of COUNTRY_LAYERS) if (map.getLayer(id)) map.setFilter(id, countryFilter);
+}
+
+function countryConds(filters) {
+  return (filters.country && filters.country !== "all")
+    ? [["==", ["get", "country"], filters.country]] : [];
 }
 
 function countryUsoNotionConds(filters) {
-  const conds = [];
-  if (filters.country && filters.country !== "all") conds.push(["==", ["get", "country"], filters.country]);
+  const conds = countryConds(filters);
   if (filters.usos && filters.usos.length > 0 && filters.usos.length < USO_ORDER.length) {
     conds.push(["in", ["get", "uso"], ["literal", filters.usos]]);
   }
@@ -857,12 +929,14 @@ export function selectedDamId() { return state.selectedDam; }
 /** Carrega só os dados de uma camada (sem a desenhar no mapa). */
 export function preloadLayerData(key) { return loadLayerData(key).catch(() => null); }
 
-/** Chave de comparação de nomes de barragem (sem acentos/prefixos). */
+/** Chave de comparação de nomes de barragem/albufeira (sem acentos/prefixos). */
 function damKey(name) {
-  let t = normalize(name || "");
+  let t = normalize(name || "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
   for (const p of ["barragem de ", "barragem da ", "barragem do ", "barragem ",
     "presa de ", "presa da ", "presa del ", "presa ",
-    "embalse de ", "embalse del ", "embalse "]) {
+    "embalse de ", "embalse del ", "embalse ",
+    "albufeira de ", "albufeira da ", "albufeira do ", "albufeira ",
+    "encoro de ", "encoro da ", "encoro do ", "encoro "]) {
     if (t.startsWith(p)) { t = t.slice(p.length); break; }
   }
   return t.trim();

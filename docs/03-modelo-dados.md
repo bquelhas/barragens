@@ -97,6 +97,10 @@ Propriedades comuns: `osm_type`, `osm_id`, `country`, `name`, `operator`,
 `wikidata`, `wikipedia`.
 
 - `plants` acrescenta `power_mw` e `method` (`generator:method`/`plant:method`).
+  As centrais **não** trazem `dam_id` nem `uso`: a barragem associa-se pelo lado
+  da barragem (`plant_ids`, ver 2.1) e é o frontend (`linkToDams`) que lhes copia
+  `uso`/`notion_url` para os filtros as alcançarem — ver
+  [04 — Frontend](04-frontend.md#filtros-applyfilters).
 
 ### 2.5 `pois` (pontos de interesse, curados)
 
