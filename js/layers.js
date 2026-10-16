@@ -4,6 +4,7 @@
 
 import {
   LAYERS, USO_COLORS, USO_ORDER, PALETTE, CLUSTER, DAM_ICON, RELATED, HILLSHADE,
+  CONFIANCA_COLORS, CONFIANCA_ORDER,
 } from "./config.js";
 import { fetchJson, distanceM, distanceToGeometryM, pointOf } from "./utils.js";
 
@@ -311,6 +312,24 @@ function addGeneric(def, fc) {
       id: `${def.key}-line`, type: "line", source: srcId, minzoom: def.minzoom,
       paint: { "line-color": colorExpr, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1.6, 16, 3.2], "line-opacity": 0.9 },
     });
+  } else if (def.kind === "submerged") {
+    // Povoados submersos (camada curada): a cor do ponto codifica a
+    // confiança da fonte; o rótulo aparece a partir de um certo zoom.
+    map.addLayer({
+      id: `${def.key}-point`, type: "circle", source: srcId, minzoom: def.minzoom,
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 4, 12, 7],
+        "circle-color": confiancaColorExpression(),
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1.2,
+        "circle-opacity": 0.92,
+      },
+    });
+    map.addLayer({
+      id: `${def.key}-label`, type: "symbol", source: srcId, minzoom: Math.max(def.minzoom, 9),
+      layout: { "text-field": ["get", "name"], "text-size": 11, "text-offset": [0, 1.1], "text-anchor": "top" },
+      paint: { "text-color": "#3a3a3a", "text-halo-color": "#ffffff", "text-halo-width": 1.4 },
+    });
   } else if (def.kind === "poi") {
     // Pontos de interesse (património): polígono/linha + rótulo do nome.
     map.addLayer({ id: `${def.key}-fill`, type: "fill", source: srcId, minzoom: def.minzoom, paint: { "fill-color": color, "fill-opacity": 0.28 } });
@@ -346,6 +365,13 @@ function usoIconExpression() {
   const expr = ["match", ["get", "uso"]];
   for (const uso of USO_ORDER) expr.push(uso, `damicon-${uso}`);
   expr.push("damicon-desconhecido");
+  return expr;
+}
+
+function confiancaColorExpression() {
+  const expr = ["match", ["get", "confianca"]];
+  for (const c of CONFIANCA_ORDER) expr.push(c, CONFIANCA_COLORS[c]);
+  expr.push(CONFIANCA_COLORS.por_verificar);
   return expr;
 }
 
@@ -464,6 +490,7 @@ const layerIdsByKey = (key) => {
   if (def.kind === "polygon") return [`${key}-fill`, `${key}-outline`];
   if (def.kind === "outline") return [`${key}-fill`, `${key}-line`];
   if (def.kind === "poi") return [`${key}-fill`, `${key}-line`, `${key}-label`];
+  if (def.kind === "submerged") return [`${key}-point`, `${key}-label`];
   return [`${key}-point`];
 };
 

@@ -189,6 +189,7 @@ fieldset.field { border: none; padding: 0; }
 }
 #legend .lg { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-xs); }
 #legend .lg .swatch { width: 11px; height: 11px; }
+#legend .lg-sep { color: var(--text-muted); font-weight: 600; }
 
 /* ------------------------------------------------------ ficha/detail */
 
@@ -231,6 +232,11 @@ fieldset.field { border: none; padding: 0; }
 
 .related-box { margin: 12px 0 6px; padding: 10px; border: 1px solid var(--border); border-left: 4px solid var(--related); border-radius: var(--radius-sm); background: var(--surface-2); }
 .related-box .related-title { font-weight: 700; font-size: var(--fs-sm); margin-bottom: 4px; }
+
+/* Caixa de ressalva dos povoados submersos (grau de confiança da fonte). */
+.aviso { margin: 12px 0 6px; padding: 10px; border: 1px solid var(--border); border-left: 4px solid #c8892b; border-radius: var(--radius-sm); background: var(--surface-2); }
+.aviso .aviso-title { font-weight: 700; font-size: var(--fs-sm); margin-bottom: 4px; }
+.aviso p { margin: 0; }
 
 .contrib { margin-top: 14px; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 10px; background: var(--surface-2); }
 .contrib h3 { margin: 0 0 6px; font-size: var(--fs-sm); }

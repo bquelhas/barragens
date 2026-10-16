@@ -2,12 +2,14 @@
 // Interface: gaveta (camadas/filtros/lista), legenda e ficha da barragem.
 // =====================================================================
 
-import { LAYERS, USO_COLORS, USO_LABELS, USO_ORDER, PALETTE } from "./config.js";
+import { LAYERS, USO_COLORS, USO_LABELS, USO_ORDER, PALETTE,
+         CONFIANCA_COLORS, CONFIANCA_LABELS, CONFIANCA_ORDER } from "./config.js";
 import { escapeHtml, fmtNumber } from "./utils.js";
 
 let dom = {};
 let hooks = {};
 let currentFilters = { country: "all", usos: [...USO_ORDER], onlyNotion: false };
+const layerVisible = {};   // key -> bool (para a legenda contextual)
 
 export function initPanel({ map, manifest, onFiltersChange, onLayerToggle, onListSort, onListShow, onOpenDamById }) {
   dom = {
@@ -24,6 +26,7 @@ export function initPanel({ map, manifest, onFiltersChange, onLayerToggle, onLis
     listSort: document.getElementById("list-sort"),
   };
   hooks = { onFiltersChange, onLayerToggle, onListSort, onListShow, onOpenDamById };
+  for (const def of LAYERS) layerVisible[def.key] = !!def.default;
 
   buildLayerList(manifest);
   buildUsoFilters();
@@ -144,7 +147,19 @@ export function renderLegend(activeUsos = [...USO_ORDER]) {
   const items = USO_ORDER.filter((u) => activeUsos.includes(u))
     .map((u) => `<span class="lg"><span class="swatch" style="background:${USO_COLORS[u]}"></span>${escapeHtml(USO_LABELS[u])}</span>`);
   items.push(`<span class="lg"><span class="swatch line" style="background:${PALETTE.related}"></span>Rede relacionada</span>`);
+  if (layerVisible["submersos"]) {
+    items.push(`<span class="lg lg-sep">Povoados submersos:</span>`);
+    for (const c of CONFIANCA_ORDER) {
+      items.push(`<span class="lg"><span class="swatch" style="background:${CONFIANCA_COLORS[c]}"></span>${escapeHtml(CONFIANCA_LABELS[c])}</span>`);
+    }
+  }
   dom.legend.innerHTML = items.join("");
+}
+
+/** O `main.js` avisa o painel sempre que uma camada é ligada/desligada. */
+export function setLayerVisible(key, visible) {
+  layerVisible[key] = !!visible;
+  renderLegend(currentFilters.usos);
 }
 
 // ---------------------------------------------------------------------
@@ -330,6 +345,43 @@ export function showPoi(p) {
       ${p.descricao ? `<p>${escapeHtml(p.descricao)}</p>` : ""}
       ${notion}
       <div class="ficha-footer">${links.join("")}</div>
+    </div>`;
+  dom.detail.hidden = false;
+  if (matchMedia("(max-width: 780px)").matches) setSheet("half");
+}
+
+/** Cartão de um povoado submerso — com a ressalva de confiança em destaque. */
+export function showSubmerged(p, coords) {
+  const name = p.name || "Povoado submerso";
+  const conf = p.confianca || "por_verificar";
+  const confColor = CONFIANCA_COLORS[conf] || CONFIANCA_COLORS.por_verificar;
+  const confLabel = CONFIANCA_LABELS[conf] || conf;
+
+  const facts = [];
+  const addFact = (k, v) => { if (v != null && v !== "") facts.push(`<div class="fact"><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v)}</div></div>`); };
+  addFact("Barragem", p.barragem);
+  addFact("Rio", p.rio);
+  addFact("Concelho", p.concelho);
+  addFact("País", p.pais);
+  addFact("Ano de enchimento", p.ano);
+
+  const coordsTxt = Array.isArray(coords) ? `${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}` : null;
+  const aviso = p.ressalva
+    ? `<div class="aviso"><div class="aviso-title">⚠ Ressalva</div><p class="small">${escapeHtml(p.ressalva)}</p></div>` : "";
+  const fonte = p.fonte ? `<p class="small muted">Fonte: ${escapeHtml(p.fonte)}</p>` : "";
+
+  dom.detailBody.innerHTML = `
+    <div class="ficha-hero"><div class="hero-fallback">${heroSvg(confColor)}</div></div>
+    <div class="ficha-body">
+      <h2 class="ficha-title">${escapeHtml(name)}</h2>
+      <div class="chips">
+        <span class="chip uso" style="background:${confColor}">${escapeHtml(confLabel)}</span>
+        ${p.barragem ? `<span class="chip">Barragem de ${escapeHtml(p.barragem)}</span>` : ""}
+      </div>
+      ${facts.length ? `<div class="facts">${facts.join("")}</div>` : ""}
+      ${aviso}
+      ${fonte}
+      ${coordsTxt ? `<div class="ficha-footer"><span class="small muted">Coordenadas (aproximadas): ${escapeHtml(coordsTxt)}</span></div>` : ""}
     </div>`;
   dom.detail.hidden = false;
   if (matchMedia("(max-width: 780px)").matches) setSheet("half");

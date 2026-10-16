@@ -33,8 +33,25 @@ export const PALETTE = {
   related: "#c8892b",      // rede elétrica relacionada (âmbar dessaturado)
   notion: "#d9a441",       // ★ / anel dourado
   poi: "#8a5a44",          // pontos de interesse (património)
+  submerged: "#2f8f6b",    // povoados submersos (cor-base = documentado)
   cluster: "#17516e",
 };
+
+// Povoados submersos: a cor do ponto indica o grau de confiança da fonte.
+// (Sem inventário oficial — cada caso traz a sua ressalva na ficha.)
+export const CONFIANCA_COLORS = {
+  confirmado: "#2f8f6b",   // verde-água — documentado em fontes
+  provavel: "#c8892b",     // âmbar — provável, por confirmar
+  por_verificar: "#8b9096",// cinza — por verificar
+};
+
+export const CONFIANCA_LABELS = {
+  confirmado: "Confirmado em fontes",
+  provavel: "Provável — por confirmar",
+  por_verificar: "Por verificar",
+};
+
+export const CONFIANCA_ORDER = ["confirmado", "provavel", "por_verificar"];
 
 // Cores por uso — escolhidas para manter contraste AA e serem
 // distinguíveis em deuteranopia (azul / âmbar / verde-água / violeta / cinza,
@@ -71,6 +88,7 @@ export const LAYERS = [
   { key: "power_lines", label: "Linhas elétricas", kind: "line", minzoom: 8, default: false, color: "#c8892b", legendSwatch: "line" },
   { key: "conduits", label: "Condutas e canais", kind: "line", minzoom: 9, default: false, color: "#4f9aa8", legendSwatch: "line" },
   { key: "pois", label: "Pontos de interesse", kind: "poi", minzoom: 11, default: true, color: "#8a5a44", legendSwatch: "polygon" },
+  { key: "submersos", label: "Povoados submersos", kind: "submerged", minzoom: 6, default: true, color: CONFIANCA_COLORS.confirmado, legendSwatch: "circle" },
   { key: "bairros", label: "Bairros barragistas", kind: "polygon", minzoom: 7, default: false, color: "#b07aa1", legendSwatch: "polygon", future: true },
 ];
 

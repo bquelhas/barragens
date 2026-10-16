@@ -498,7 +498,8 @@ def simplify_and_round(geometry, layer: str):
 
 # Todas as camadas que o manifest pode anunciar.
 LAYER_KEYS = ["dams", "dam_geoms", "reservoirs", "weirs", "plants",
-              "substations", "power_lines", "conduits", "pois", "bairros"]
+              "substations", "power_lines", "conduits", "pois", "bairros",
+              "submersos"]
 
 # Países processados na execução atual (definido em `run`).
 CURRENT_COUNTRIES: list[str] = []

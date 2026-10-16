@@ -308,6 +308,15 @@ do Notion.)
   (`POIS`, com `osm`, `name`, `kind`, `descricao`, `dam_id`, `notion_url`) e a
   geometria real é obtida da API do OSM com `python scripts/build_pois.py`,
   que gera `data/pois.geojson` (sem Overpass).
+* **Povoados submersos**: camada curada (`data/submersos.geojson`) com povoados
+  com registo de perda de núcleo habitacional por albufeiras. Cada ponto traz
+  `barragem`, `rio`, `concelho`, `ano`, `confianca` (`confirmado` / `provavel` /
+  `por_verificar`), `fonte` e uma `ressalva`. A **cor do ponto codifica a
+  confiança** e a ficha mostra a ressalva de cada caso. Não existe inventário
+  oficial — é um levantamento curado, a confirmar caso a caso (coordenadas
+  aproximadas). O pipeline preserva a camada: `submersos` está em `LAYER_KEYS`
+  (`scripts/build_data.py`) e o ficheiro único `data/submersos.geojson` é
+  apanhado pelo `rebuild_manifest`.
 * **Ícones de barragem** desenhados (um por uso), dimensionados pela altura ou
   potência; anel dourado para quem tem página Notion.
 * **Boas-vindas** (primeira visita, reabrível com “?”): contadores por país e

@@ -19,7 +19,8 @@
     "power_lines": 7570,
     "conduits": 8554,
     "pois": 1,
-    "bairros": 0
+    "bairros": 0,
+    "submersos": 12
   },
   "layers": {
     "dams": [
@@ -59,6 +60,9 @@
     ],
     "bairros": [
       "bairros.geojson"
+    ],
+    "submersos": [
+      "submersos.geojson"
     ]
   },
   "counts_by_country": {
@@ -83,6 +87,6 @@
       "conduits": 2432
     }
   },
-  "total_features": 33412,
+  "total_features": 33424,
   "notion_count": 0
 }

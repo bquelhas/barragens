@@ -105,7 +105,7 @@ async function onMapReady(initial) {
   panel.initPanel({
     map, manifest,
     onFiltersChange: (f) => { layers.applyFilters(f); writeHash(); },
-    onLayerToggle: (key, visible) => layers.setVisibility(key, visible),
+    onLayerToggle: (key, visible) => { layers.setVisibility(key, visible); panel.setLayerVisible(key, visible); },
     onListSort: (field) => discover.setSort(field),
     onListShow: () => discover.refreshList(),
     onOpenDamById: (damId) => openDamById(damId, null),
@@ -184,6 +184,10 @@ function wireMapEvents() {
     map.on("mouseenter", "pois-fill", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "pois-fill", () => (map.getCanvas().style.cursor = ""));
   }
+  if (map.getLayer("submersos-point")) {
+    map.on("mouseenter", "submersos-point", () => (map.getCanvas().style.cursor = "pointer"));
+    map.on("mouseleave", "submersos-point", () => (map.getCanvas().style.cursor = ""));
+  }
 
   // Um único handler de clique. Prioridade: cluster > barragem > albufeira >
   // barragem mais próxima (garante que continua clicável com ícones sobrepostos).
@@ -207,6 +211,10 @@ function wireMapEvents() {
     const poiLayers = ["pois-fill", "pois-line"].filter((id) => map.getLayer(id));
     const poiHits = poiLayers.length ? map.queryRenderedFeatures(e.point, { layers: poiLayers }) : [];
     if (poiHits.length) { openPoi(poiHits[0].properties); return; }
+
+    const subLayers = ["submersos-point", "submersos-label"].filter((id) => map.getLayer(id));
+    const subHits = subLayers.length ? map.queryRenderedFeatures(e.point, { layers: subLayers }) : [];
+    if (subHits.length) { openSubmerged(subHits[0]); return; }
 
     const near = nearestDam(e.point, 22);
     if (near) openDam(near);
@@ -351,6 +359,14 @@ function openReservoirProps(props) {
 function openPoi(props) {
   layers.clearSelection();
   panel.showPoi(props);
+  discover.markSelected(null);
+  writeHash();
+}
+
+/** Mostra o cartão de um povoado submerso (com a sua ressalva). */
+function openSubmerged(feature) {
+  layers.clearSelection();
+  panel.showSubmerged(feature.properties || {}, feature.geometry?.coordinates);
   discover.markSelected(null);
   writeHash();
 }
