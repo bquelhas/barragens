@@ -247,7 +247,7 @@ NOTION_OSM_OVERRIDES = {
     "Valeira": "relation/2915548",         # Barragem da Valeira (estava em "Embalse del Val")
     "Alto Cávado": "relation/18456918",    # Barragem do Alto Cávado
     "Covão do Meio": "relation/10888990",  # Barragem de Covão do Meio
-    # POR CONFIRMAR — não mexer sem resposta: "Freigil" tem hoje
-    # way/190040360 ("Presa do Rei", Galiza); suspeita-se que seja a Barragem
-    # do Ermal (relation/2462599).
+    # Confirmado pela fonte: barragem no rio Cabrum, 17 m, 4,6 MW, concluída em
+    # 1955 (estava em way/190040360, a "Presa do Rei", na Galiza).
+    "Freigil": "relation/20692566",        # Barragem de Freigil
 }
