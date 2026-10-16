@@ -15,6 +15,7 @@ from __future__ import annotations
 import glob
 import json
 import re
+import unicodedata
 
 import config
 
@@ -46,6 +47,42 @@ def find_property(props: dict | None, *names: str) -> tuple[str | None, dict | N
         if name.strip().lower() in want:
             return name, prop
     return None, None
+
+
+# Código de tipo no início do título do Notion: `AS` = Aldeia submersa,
+# `BN` = Bairro novo (ex.: "AS Venda Nova", "BN Salamonde"). É só um marcador
+# de tipo — `Tipo_objeto` já o diz e a ficha já o mostra — por isso sai do nome
+# que vai para o mapa. Exige maiúsculas e um separador (ou o fim do título),
+# para não cortar topónimos que comecem por "As…"/"Bn…".
+_TITLE_CODE_RE = re.compile(r"^(?:AS|BN)(?:[\s\-–—:.]+|$)")
+
+
+def clean_title(title: str | None) -> str:
+    """Tira o código de tipo (`AS `/`BN `) do início do título."""
+    text = (title or "").strip()
+    if not text:
+        return text
+    stripped = _TITLE_CODE_RE.sub("", text, count=1).strip()
+    return stripped or text
+
+
+def _override_key(title: str | None) -> str:
+    """Chave de comparação de títulos: sem código de tipo, acentos ou caixa."""
+    text = unicodedata.normalize("NFKD", clean_title(title))
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    return " ".join(text.casefold().split())
+
+
+_OVERRIDES_CACHE: dict[str, str] | None = None
+
+
+def manual_dam(title: str | None) -> str | None:
+    """Id OSM definido à mão para esta página (`config.NOTION_OSM_OVERRIDES`)."""
+    global _OVERRIDES_CACHE
+    if _OVERRIDES_CACHE is None:
+        _OVERRIDES_CACHE = {_override_key(k): v
+                            for k, v in (config.NOTION_OSM_OVERRIDES or {}).items()}
+    return _OVERRIDES_CACHE.get(_override_key(title))
 
 
 def _iter_features(layer: str):

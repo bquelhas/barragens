@@ -335,8 +335,9 @@ def main():
 
     dams = load_dams()
     index = build_index(dams)
+    resolver = notion_ids.DamResolver()
 
-    counts = {"ok": 0, "ja_tinha": 0, "ambiguo": 0, "sem_match": 0, "erro": 0}
+    counts = {"ok": 0, "ja_tinha": 0, "manual": 0, "ambiguo": 0, "sem_match": 0, "erro": 0}
     relatorio: list[list[str]] = []   # [pagina, id_osm, estado, nota]
 
     for page in pages:
@@ -350,6 +351,34 @@ def main():
             continue
 
         existing = page_existing_id(page)
+
+        # Ligação definida à mão (nome ambíguo, sem correspondência, ou um id
+        # que aponta para outra coisa). Não sobrepõe um valor que já aponte para
+        # uma barragem válida, para não desfazer escolhas feitas no Notion.
+        manual = notion_ids.manual_dam(titulo)
+        if manual and not resolver.resolve(manual)[0]:
+            log(f"[aviso] {titulo}: id manual {manual} não existe nos dados — ignorado.")
+            manual = None
+        atual = notion_ids.normalize_osm_id(existing)
+        if manual and manual != atual and not (atual and resolver.resolve(atual)[0]):
+            if args.apply:
+                try:
+                    set_page_osm(token, page_id, osm_value(manual, prop_kind), prop_kind)
+                    counts["manual"] += 1
+                    log(f"[manual] {titulo} -> {manual}")
+                    relatorio.append([titulo, manual, "ligação manual", ""])
+                    time.sleep(WRITE_PAUSE_S)
+                except urllib.error.HTTPError as exc:
+                    counts["erro"] += 1
+                    relatorio.append([titulo, manual, "erro", f"HTTP {exc.code}"])
+                    log(f"[erro] {titulo}: HTTP {exc.code} "
+                        f"{exc.read().decode('utf-8', 'replace')[:200]}")
+            else:
+                counts["manual"] += 1
+                relatorio.append([titulo, manual, "ligação manual (ensaio)", ""])
+                log(f"[manual?] {titulo} -> {manual}")
+            continue
+
         if existing:
             counts["ja_tinha"] += 1
             relatorio.append([titulo, existing, "já tinha", ""])
@@ -385,7 +414,8 @@ def main():
 
     log("")
     log(f"[resumo] já tinham ID: {counts['ja_tinha']} | "
-        f"a preencher: {counts['ok']} | ambíguos: {counts['ambiguo']} | "
+        f"a preencher: {counts['ok']} | ligações manuais: {counts['manual']} | "
+        f"ambíguos: {counts['ambiguo']} | "
         f"sem correspondência: {counts['sem_match']} | erros: {counts['erro']}")
     log(f"[resumo] relatório para revisão: {REPORT_PATH}")
     if not args.apply:

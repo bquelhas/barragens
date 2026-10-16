@@ -24,6 +24,24 @@ o botão **"Copiar ID"** da ficha. Também se pode colar o **link completo do
 OSM**; o script normaliza. Aceita-se o id de uma **barragem** **ou de uma
 albufeira** — uma albufeira é traduzida para a barragem associada.
 
+### Ligações manuais (`NOTION_OSM_OVERRIDES`)
+
+Quando o casamento automático não chega — nome ambíguo (duas ou mais barragens
+com o mesmo nome), nome sem correspondência, um id que aponta para outra coisa,
+ou uma aldeia/bairro sem a barragem-mãe ligada na base — a ligação define-se à
+mão em `scripts/config.py` → `NOTION_OSM_OVERRIDES`, com o título da página como
+chave:
+
+```python
+"Facho/Vareta": "way/1232230351",   # Barragem do Facho II
+```
+
+O código `AS `/`BN ` do título, a caixa e os acentos são ignorados na procura. A
+ligação manual só é usada quando o automático falha, e **nunca sobrepõe** um
+valor que já aponte para uma barragem válida (para não desfazer escolhas feitas
+no Notion). Serve as duas leituras: preenche a coluna `OSM` (barragens) e liga
+as aldeias/bairros à barragem certa.
+
 ### Lado do código (`fetch_notion.py`)
 
 - Consulta a base pela **API oficial** (`POST /v1/databases/{db}/query`),

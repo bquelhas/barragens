@@ -216,3 +216,28 @@ NOTION_COVER_PROPERTY = "Foto"     # ficheiro ou URL
 NOTION_SUMMARY_PROPERTY = "Resumo"
 # Domínio público do Notion (usado para converter URLs internas).
 NOTION_PUBLIC_DOMAIN = "notion.site"
+
+# Ligações definidas à mão página → barragem, para os poucos casos em que o
+# casamento automático não chega: nome ambíguo (várias barragens com o mesmo
+# nome), nome sem correspondência, um id que aponta para outra coisa, ou uma
+# aldeia/bairro sem a barragem-mãe ligada na base.
+#
+# Chave = título da página tal como está no Notion (o código inicial `AS `/`BN `
+# é ignorado). Valor = id do OpenStreetMap, no formato `tipo/id`.
+# Só é usado quando o automático falha, e nunca sobrepõe um valor que já aponte
+# para uma barragem válida.
+NOTION_OSM_OVERRIDES = {
+    # Nome ambíguo nos dados (3 ou 2 candidatos).
+    "Fratel": "relation/2431469",
+    "Ribeira do Arade": "way/84985422",
+    "Vilar": "way/147544190",
+    "Miranda do Douro": "way/71588050",
+    # Sem correspondência por nome.
+    "Facho/Vareta": "way/1232230351",      # Barragem do Facho II
+    "Bravura/Odiáxere": "way/159677144",   # Barragem de Odeáxere
+    # Id existente que aponta para um açude sem nome.
+    "Barragem da Régua": "relation/2915595",
+    # Aldeia/bairro sem a barragem-mãe ligada na base.
+    "AS Vilarinho de Negrões": "relation/2449098",   # Barragem do Alto Rabagão
+    "BN Belver": "way/369746884",
+}

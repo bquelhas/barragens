@@ -114,21 +114,9 @@ def slug(text: str) -> str:
     return norm or "sem-nome"
 
 
-# Código de tipo no início do título do Notion: `AS` = Aldeia submersa,
-# `BN` = Bairro novo (ex.: "AS Venda Nova", "BN Salamonde"). É só um marcador
-# de tipo — `Tipo_objeto` já o diz e a ficha já o mostra — por isso sai do nome
-# que vai para o mapa. Exige maiúsculas e um separador (ou o fim do título),
-# para não cortar topónimos que comecem por "As…"/"Bn…".
-_TITLE_CODE_RE = re.compile(r"^(?:AS|BN)(?:[\s\-–—:.]+|$)")
-
-
-def clean_title(title: str | None) -> str:
-    """Tira o código de tipo (`AS `/`BN `) do início do título."""
-    text = (title or "").strip()
-    if not text:
-        return text
-    stripped = _TITLE_CODE_RE.sub("", text, count=1).strip()
-    return stripped or text
+# Nota: o código de tipo no início do título ("AS " = aldeia submersa,
+# "BN " = bairro novo) sai do nome que vai para o mapa — ver
+# `notion_ids.clean_title`.
 
 
 def _year(value: str) -> str:
@@ -209,7 +197,7 @@ def record_from_page(page: dict) -> dict:
     return {
         "page_id": page.get("id"),
         "url": page.get("url"),
-        "name": clean_title(prop_text(_prop(props, P_TITLE))) or "(sem título)",
+        "name": notion_ids.clean_title(prop_text(_prop(props, P_TITLE))) or "(sem título)",
         "tipo_objeto": prop_text(_prop(props, P_TIPO_OBJ)),
         "camadas": prop_list(_prop(props, P_CAMADAS)),
         "coordenadas": prop_text(_prop(props, P_COORD)) or prop_text(_prop(props, P_LOCALIZACAO)),
@@ -270,7 +258,7 @@ def load_from_api() -> list[dict]:
     if pages:
         log(f"[notion] propriedades da base: {sorted(pages[0].get('properties', {}).keys())}")
     # índices id -> título / id -> OSM (para resolver relações)
-    id_to_title = {p["id"]: clean_title(prop_text(p.get("properties", {}).get(P_TITLE))) for p in pages}
+    id_to_title = {p["id"]: notion_ids.clean_title(prop_text(p.get("properties", {}).get(P_TITLE))) for p in pages}
     id_to_osm = {p["id"]: prop_text(p.get("properties", {}).get(P_OSM)) for p in pages}
     records = []
     for p in pages:
@@ -299,7 +287,7 @@ def _related_titles_from_text(value: str) -> list[str]:
     for part in re.split(r",\s*(?=[^)]*(?:\(|$))", value or ""):
         title = part.split(" (")[0].strip()
         if title:
-            out.append(clean_title(title))
+            out.append(notion_ids.clean_title(title))
     return out
 
 
@@ -340,7 +328,7 @@ def load_from_export(dirpath: str) -> list[dict]:
         records.append({
             "page_id": None,
             "url": None,
-            "name": clean_title(title),
+            "name": notion_ids.clean_title(title),
             "tipo_objeto": joined.get(P_TIPO_OBJ, ""),
             "camadas": [x.strip() for x in joined.get(P_CAMADAS, "").split(",") if x.strip()],
             "coordenadas": joined.get(P_COORD, ""),
@@ -460,6 +448,13 @@ def resolve_parent_dam_id(rec: dict, by_name: dict, resolver: "notion_ids.DamRes
             dam_id, _ = resolver.resolve(brec.get("osm"))
             if dam_id:
                 return dam_id
+    # Último recurso: ligação definida à mão (`config.NOTION_OSM_OVERRIDES`),
+    # para páginas sem a barragem-mãe ligada na base.
+    manual = notion_ids.manual_dam(rec.get("name"))
+    if manual:
+        dam_id, _ = resolver.resolve(manual)
+        if dam_id:
+            return dam_id
     return None
 
 

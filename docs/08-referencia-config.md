@@ -91,6 +91,7 @@ A configuração está centralizada em dois ficheiros que se **espelham**:
 | `NOTION_COVER_PROPERTY` | `"Foto"` | Propriedade da capa |
 | `NOTION_SUMMARY_PROPERTY` | `"Resumo"` | Propriedade do resumo |
 | `NOTION_PUBLIC_DOMAIN` | `"notion.site"` | Domínio para converter URLs internas |
+| `NOTION_OSM_OVERRIDES` | `{}` (só 9 entradas) | Ligações **manuais** página → `tipo/id` do OSM, para os casos em que o automático falha (nome ambíguo, sem correspondência, id errado, aldeia/bairro sem barragem-mãe). Usadas por `push_notion_osm.py` e `fetch_lost_cities.py` |
 
 > O `build_data.py` define ainda `LAYER_KEYS` (camadas que o manifest pode
 > anunciar) e `CURRENT_COUNTRIES` (países da execução atual).
