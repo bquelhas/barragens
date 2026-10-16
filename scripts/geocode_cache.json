@@ -107,6 +107,13 @@
     "place_rank": 24,
     "type": "cemetery"
   },
+  "centro": {
+    "display_name": "Centro, Portugal",
+    "lat": 39.980205,
+    "lon": -7.9055909,
+    "place_rank": 25,
+    "type": "statistical"
+  },
   "concatedral de miranda do douro": {
     "display_name": "Concatedral de Miranda do Douro, Rue de l Paço, Miranda do Douro, Bragança, 5210-211, Portugal",
     "lat": 41.4930585,
@@ -120,6 +127,13 @@
     "lon": -6.2738187,
     "place_rank": 14,
     "type": "administrative"
+  },
+  "norte": {
+    "display_name": "Norte, Santa Bárbara, Vila do Porto, Açores, Portugal",
+    "lat": 37.0028353,
+    "lon": -25.0676137,
+    "place_rank": 20,
+    "type": "hamlet"
   },
   "ourique, portugal": {
     "display_name": "Ourique, Beja, Portugal",
@@ -151,6 +165,13 @@
     "place_rank": 20,
     "type": "dam"
   },
+  "sul": {
+    "display_name": "Sul, São Pedro do Sul, Viseu, Portugal",
+    "lat": 40.8357637,
+    "lon": -8.0423237,
+    "place_rank": 16,
+    "type": "administrative"
+  },
   "tabuaço, portugal": {
     "display_name": "Tabuaço, Viseu, Portugal",
     "lat": 41.1173591,
@@ -164,6 +185,13 @@
     "lon": -8.1869841,
     "place_rank": 19,
     "type": "village"
+  },
+  "vale do tejo": {
+    "display_name": "Autoestrada do Sul do Tejo, Vale do Passil, Rego da Amoreira, Alcochete, Setúbal, Portugal",
+    "lat": 38.6955097,
+    "lon": -8.9017218,
+    "place_rank": 26,
+    "type": "motorway"
   },
   "vidual de baixo, pampilhosa da serra, portugal": {
     "display_name": "Vidual de Baixo, Fajão-Vidual, Pampilhosa da Serra, Coimbra, Portugal",

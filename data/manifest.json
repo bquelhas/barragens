@@ -19,8 +19,8 @@
     "power_lines": 7570,
     "conduits": 8554,
     "pois": 1,
-    "bairros": 14,
-    "submersos": 16
+    "bairros": 16,
+    "submersos": 18
   },
   "layers": {
     "dams": [
@@ -89,6 +89,6 @@
       "conduits": 2432
     }
   },
-  "total_features": 33442,
+  "total_features": 33446,
   "notion_count": 0
 }
