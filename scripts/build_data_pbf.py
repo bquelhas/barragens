@@ -157,12 +157,21 @@ class Extractor(osmium.SimpleHandler):
 
     def area(self, a):
         # `area()` é chamado tanto para relações multipolígono como para
-        # malhas fechadas. Interessa-nos sobretudo as albufeiras.
+        # malhas fechadas. As malhas fechadas de barragens/açudes já são
+        # apanhadas em `way()`; aqui interessam as **relações** — em especial
+        # as barragens mapeadas como multipolígono, que de outro modo ficavam
+        # de fora (era o caso de várias barragens grandes).
+        from_way = a.from_way() if hasattr(a, "from_way") else False
+
         if "reservoirs" in self.layers and matches("reservoirs", a.tags):
             geom = _rings_to_polygon(a)
-            from_way = a.from_way() if hasattr(a, "from_way") else False
             osm_type = "way" if from_way else "relation"
             self._add("reservoirs", osm_type, a.id, a.tags, geom)
+
+        if not from_way:
+            for layer in ("dams", "weirs"):
+                if layer in self.layers and matches(layer, a.tags):
+                    self._add(layer, "relation", a.id, a.tags, _rings_to_polygon(a))
 
 
 # ---------------------------------------------------------------------------

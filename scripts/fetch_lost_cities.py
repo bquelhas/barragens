@@ -181,29 +181,35 @@ def prop_relation_ids(prop: dict | None) -> list[str]:
     return [r.get("id", "") for r in prop.get("relation", [])]
 
 
+def _prop(props: dict, name: str) -> dict | None:
+    """Propriedade da base pelo nome, ignorando maiúsculas/minúsculas."""
+    _, p = notion_ids.find_property(props, name)
+    return p
+
+
 def record_from_page(page: dict) -> dict:
     props = page.get("properties", {})
     return {
         "page_id": page.get("id"),
         "url": page.get("url"),
-        "name": prop_text(props.get(P_TITLE)) or "(sem título)",
-        "tipo_objeto": prop_text(props.get(P_TIPO_OBJ)),
-        "camadas": prop_list(props.get(P_CAMADAS)),
-        "coordenadas": prop_text(props.get(P_COORD)),
-        "localizacao": prop_text(props.get(P_LOCALIZACAO)),
-        "rio": prop_text(props.get(P_RIO)),
-        "tipo": prop_text(props.get(P_TIPO)),
-        "promotor": prop_text(props.get(P_PROMOTOR)),
-        "ruinas": prop_list(props.get(P_RUINAS)),
-        "ano": _year(prop_text(props.get(P_CONCLUSAO))),
-        "ano_inicial": _year(prop_text(props.get(P_INICIAL))),
-        "notas_cr": prop_text(props.get(P_NOTAS_CR)),
-        "notas_ihp": prop_text(props.get(P_NOTAS_IHP)),
-        "arquivos": prop_list(props.get(P_ARQUIVOS)),
-        "fotografias": prop_text(props.get(P_FOTOS)),
-        "related_ids": prop_relation_ids(props.get(P_RELATED)),
+        "name": prop_text(_prop(props, P_TITLE)) or "(sem título)",
+        "tipo_objeto": prop_text(_prop(props, P_TIPO_OBJ)),
+        "camadas": prop_list(_prop(props, P_CAMADAS)),
+        "coordenadas": prop_text(_prop(props, P_COORD)),
+        "localizacao": prop_text(_prop(props, P_LOCALIZACAO)),
+        "rio": prop_text(_prop(props, P_RIO)),
+        "tipo": prop_text(_prop(props, P_TIPO)),
+        "promotor": prop_text(_prop(props, P_PROMOTOR)),
+        "ruinas": prop_list(_prop(props, P_RUINAS)),
+        "ano": _year(prop_text(_prop(props, P_CONCLUSAO))),
+        "ano_inicial": _year(prop_text(_prop(props, P_INICIAL))),
+        "notas_cr": prop_text(_prop(props, P_NOTAS_CR)),
+        "notas_ihp": prop_text(_prop(props, P_NOTAS_IHP)),
+        "arquivos": prop_list(_prop(props, P_ARQUIVOS)),
+        "fotografias": prop_text(_prop(props, P_FOTOS)),
+        "related_ids": prop_relation_ids(_prop(props, P_RELATED)),
         "related_osm": [],
-        "osm": prop_text(props.get(P_OSM)),
+        "osm": prop_text(_prop(props, P_OSM)),
         "related_titles": [],
     }
 
@@ -244,6 +250,8 @@ def load_from_api() -> list[dict]:
     if not token or not database_id:
         return []
     pages = query_database(token, database_id)
+    if pages:
+        log(f"[notion] propriedades da base: {sorted(pages[0].get('properties', {}).keys())}")
     # índices id -> título / id -> OSM (para resolver relações)
     id_to_title = {p["id"]: prop_text(p.get("properties", {}).get(P_TITLE)) for p in pages}
     id_to_osm = {p["id"]: prop_text(p.get("properties", {}).get(P_OSM)) for p in pages}
@@ -254,6 +262,8 @@ def load_from_api() -> list[dict]:
         rec["related_osm"] = [id_to_osm.get(i, "") for i in rec["related_ids"]]
         records.append(rec)
     log(f"[notion] {len(records)} registos lidos via API.")
+    com_coord = sum(1 for r in records if r.get("coordenadas"))
+    log(f"[notion] {com_coord} de {len(records)} registos com «{P_COORD}» preenchido.")
     return records
 
 

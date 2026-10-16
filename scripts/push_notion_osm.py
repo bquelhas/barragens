@@ -84,7 +84,11 @@ def normalize_name(name: str | None) -> str:
         if text.startswith(prefix):
             text = text[len(prefix):]
             break
-    return text.strip()
+    # Colapsa conectores: "Castelo de Bode" passa a casar com "Castelo do Bode".
+    text = " " + text + " "
+    for con in (" de ", " do ", " da ", " dos ", " das ", " del ", " la ", " el ", " y "):
+        text = text.replace(con, " ")
+    return " ".join(text.split())
 
 
 # ---------------------------------------------------------------------------
@@ -219,8 +223,13 @@ def build_index(dams: list[dict]) -> dict[str, list[dict]]:
     for p in dams:
         # Inclui o nome da albufeira associada (`reservoir_name`): muitas
         # barragens grandes não têm nome próprio no OSM (o nome está na albufeira).
+        # Inclui também o link Wikipédia (`pt:Barragem de X`), que muitas vezes
+        # tem o nome que falta.
+        wiki = p.get("wikipedia") or ""
+        if ":" in wiki:
+            wiki = wiki.split(":", 1)[1]
         for raw in (p.get("name"), p.get("name_pt"), p.get("name_es"),
-                    p.get("reservoir_name")):
+                    p.get("reservoir_name"), wiki):
             key = normalize_name(raw)
             if key:
                 index.setdefault(key, []).append(p)
