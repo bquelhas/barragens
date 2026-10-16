@@ -37,6 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config  # noqa: E402
 import geo  # noqa: E402
 import overpass  # noqa: E402
+import reservoir_links  # noqa: E402
 from shapely.geometry import mapping, shape  # noqa: E402
 from shapely.strtree import STRtree  # noqa: E402
 
@@ -421,11 +422,46 @@ def filter_dams(dams: list[dict]) -> list[dict]:
     return kept
 
 
-def link_and_filter_reservoirs(reservoirs: list[dict], dams: list[dict]) -> list[dict]:
+def apply_name_links(dams: list[dict], reservoirs: list[dict]) -> dict[str, str]:
+    """Corrige a ligação barragem->albufeira pelo **nome** (ver `reservoir_links`).
+
+    Numa cascata, a associação geométrica liga por vezes a barragem à albufeira
+    da vizinha (ex.: «Barragem de Picote → Albufeira de Bemposta»). Fica ligada a
+    albufeira cujo nome corresponde ao da barragem; obras secundárias
+    (descarregadores, diques, tomadas) não têm albufeira com o seu nome, por isso
+    mantêm a escolha geométrica.
+
+    Devolve o mapa dono (`albufeira -> barragem`) para o sentido inverso.
+    """
+    by_rid = {f'{r["osm_type"]}/{r["osm_id"]}': r for r in reservoirs}
+    dam_rows = [(d["dam_id"], _tags_names(d["tags"]),
+                 d.get("reservoir_id"), d.get("reservoir_name")) for d in dams]
+    res_rows = [(rid, _tags_names(r["tags"]), None) for rid, r in by_rid.items()]
+    relink, owner = reservoir_links.resolve(dam_rows, res_rows)
+    for d in dams:
+        target = relink.get(d["dam_id"])
+        r = by_rid.get(target) if target else None
+        if r is None:
+            continue
+        d["reservoir_id"] = target
+        d["reservoir_name"] = r["tags"].get("name")
+        d["reservoir_area_ha"] = round(geo.area_ha(r["geom"]), 1)
+    return owner
+
+
+def _tags_names(tags: dict) -> list[str]:
+    return [tags.get("name"), tags.get("name:pt"), tags.get("name:es")]
+
+
+def link_and_filter_reservoirs(reservoirs: list[dict], dams: list[dict],
+                              owner: dict[str, str] | None = None) -> list[dict]:
     """
     Liga cada albufeira à sua barragem (propriedade `dam_id`) e filtra as
     irrelevantes: ficam só as **ligadas a uma barragem** ou com
     **área >= `MIN_RESERVOIR_AREA_HA`** (descarta charcas/tanques).
+
+    `owner` (de `apply_name_links`) tem prioridade — é o dono pelo nome; sem ele,
+    cai no primeiro dam que reclamar a albufeira.
 
     Também guarda `area_ha` na própria albufeira (usada pela interface).
     """
@@ -435,6 +471,7 @@ def link_and_filter_reservoirs(reservoirs: list[dict], dams: list[dict]) -> list
         rid = d.get("reservoir_id")
         if rid and rid not in by_reservoir:
             by_reservoir[rid] = d["dam_id"]
+    owner = owner or {}
 
     kept = []
     dropped = 0
@@ -442,7 +479,7 @@ def link_and_filter_reservoirs(reservoirs: list[dict], dams: list[dict]) -> list
         rid = f'{r["osm_type"]}/{r["osm_id"]}'
         area = geo.area_ha(r["geom"])
         r["area_ha"] = area
-        r["dam_id"] = by_reservoir.get(rid)
+        r["dam_id"] = owner.get(rid) or by_reservoir.get(rid)
         if r["dam_id"] or area >= config.MIN_RESERVOIR_AREA_HA:
             kept.append(r)
         else:
@@ -718,8 +755,9 @@ def run(countries: list[str], offline: bool, force: bool, skip_infra: bool = Fal
     # -- Associação espacial ---------------------------------------------
     log("[build] a associar albufeiras e centrais às barragens...")
     associate(all_dams, all_reservoirs, all_plants)
+    owner = apply_name_links(all_dams, all_reservoirs)
     all_dams = filter_dams(all_dams)
-    all_reservoirs = link_and_filter_reservoirs(all_reservoirs, all_dams)
+    all_reservoirs = link_and_filter_reservoirs(all_reservoirs, all_dams, owner)
 
     # -- Filtragem fina das infraestruturas ------------------------------
     def within_dams(feats, max_m):

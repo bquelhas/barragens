@@ -139,6 +139,24 @@ flowchart TD
   - `uso_fonte` guarda a proveniência (ex.: `"albufeira (usage=power); central
     associada (4)"`) para transparência — mostrada em "Detalhes técnicos".
 
+### Correcção pelo nome (`apply_name_links`)
+
+Numa cascata, a barragem *toca* duas albufeiras (a que represa e o início da de
+jusante) e a regra geométrica escolhe às vezes a errada — a ficha da barragem
+passa a mostrar o nome da vizinha («Barragem de Picote → Albufeira de
+Bemposta»), a albufeira abre a barragem errada e o id de uma albufeira colado no
+Notion resolve para a barragem vizinha.
+
+Logo a seguir a `associate`, `apply_name_links` (regra em `reservoir_links.py`)
+liga a barragem à albufeira **cujo nome corresponde ao seu**, mas só quando a
+ligação actual pertence, pelo nome, a outra barragem. Obras secundárias
+(descarregadores, diques, tomadas) não têm albufeira com o seu nome, por isso
+mantêm a escolha geométrica. O sentido inverso (`albufeira -> dam_id`) passa a
+preferir a barragem com o nome correspondente.
+
+O mesmo se pode aplicar aos dados já escritos, sem correr o pipeline:
+`python scripts/fix_reservoir_links.py [--apply]`.
+
 ## 7. Filtragem
 
 ### Barragens (`filter_dams`)
@@ -210,6 +228,23 @@ O título das páginas pode trazer um **código de tipo** no início — `AS`
 (aldeia submersa) ou `BN` (bairro novo), ex. `AS Venda Nova`. É ignorado: o
 nome que vai para o mapa fica só «Venda Nova» (o tipo já vem de `Tipo_objeto`
 e é mostrado na ficha).
+
+### `fix_reservoir_links.py`
+
+Aplica a regra de `reservoir_links.py` (a mesma que o pipeline usa em
+`apply_name_links`) aos ficheiros **já escritos** — `data/dams_*.geojson` e
+`data/reservoirs_*.geojson`. Corrige a ligação barragem ↔ albufeira em cascata
+(ex.: «Barragem de Picote → Albufeira de Bemposta» → «Albufeira de Picote») sem
+correr o pipeline. Não muda geometria nem contagens, só `reservoir_id`,
+`reservoir_name`, `reservoir_area_ha` e o `dam_id` inverso, em **todas** as
+cópias PT/ES. Ensaio por omissão; `--apply` escreve. É idempotente.
+
+### `reservoir_links.py`
+
+Regra partilhada (só stdlib) que decide a ligação pelo **nome**: `name_key`
+normaliza (sem acentos, sem prefixos `barragem`/`albufeira`/`presa`/`encoro`/…,
+pontuação → espaço) e `resolve` devolve as ligações a corrigir e o dono de cada
+albufeira. Ver [02 — Pipeline](02-pipeline-dados.md#correcção-pelo-nome-apply_name_links).
 
 ### `build_pois.py`
 

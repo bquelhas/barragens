@@ -42,6 +42,13 @@ lista **manda**: se o valor da página for diferente do indicado, é corrigido
 (barragens) e liga as aldeias/bairros à barragem certa. Para deixar de corrigir
 uma página, basta tirá-la da lista.
 
+Algumas entradas existem por causa da associação em cascata (Picote, Fratel,
+Valeira, Régua, Miranda): o id de uma albufeira resolvia para a barragem
+vizinha. Isso passou a ser corrigido na origem (ver
+[02 — Pipeline](02-pipeline-dados.md#correcção-pelo-nome-apply_name_links)), pelo
+que essas entradas ficaram **redundantes** — mantêm-se por segurança (a lista
+manda), mas podem ser retiradas.
+
 ### Lado do código (`fetch_notion.py`)
 
 - Consulta a base pela **API oficial** (`POST /v1/databases/{db}/query`),

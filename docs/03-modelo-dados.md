@@ -91,6 +91,10 @@ Contorno real da barragem, ligado por `dam_id`. Propriedades:
 | `usage`, `reservoir_type` | Tags OSM de uso |
 | `area_ha` | Área (ha) |
 
+O par barragem ↔ albufeira é geometria + **nome**: numa cascata, cada barragem
+fica com a albufeira cujo nome corresponde ao seu (ver
+[02 — Pipeline](02-pipeline-dados.md#correcção-pelo-nome-apply_name_links)).
+
 ### 2.4 Camadas simples (`weirs`, `substations`, `power_lines`, `conduits`)
 
 Propriedades comuns: `osm_type`, `osm_id`, `country`, `name`, `operator`,

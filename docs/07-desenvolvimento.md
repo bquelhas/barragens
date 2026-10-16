@@ -68,7 +68,20 @@ python scripts/build_pois.py             # vai à API do OSM
 python scripts/build_pois.py --offline   # mostra o que faria
 ```
 
-## 6. Validar o trabalho
+## 6. Corrigir a ligação barragem ↔ albufeira
+
+Se aparecer uma ficha com a albufeira da barragem vizinha (cascata), aplica a
+regra do nome aos dados já escritos — sem correr o pipeline:
+
+```bash
+python scripts/fix_reservoir_links.py            # ensaio (mostra o que mudaria)
+python scripts/fix_reservoir_links.py --apply    # escreve
+```
+
+É idempotente e não muda geometria nem contagens. Ver
+[02 — Pipeline](02-pipeline-dados.md#correcção-pelo-nome-apply_name_links).
+
+## 7. Validar o trabalho
 
 - **Dados**: confirma que `data/manifest.json` tem `generated_at` recente e que
   `counts` não caíram abruptamente; abre o site e verifica a ficha de uma
@@ -81,7 +94,7 @@ python scripts/build_pois.py --offline   # mostra o que faria
 > Não há suite de testes automatizada no repositório. A validação é manual e,
 > no pipeline, por guardas (`MIN_DAMS_RATIO`, extração vazia → abortar).
 
-## 7. Convenções de código
+## 8. Convenções de código
 
 - **Idioma**: comentários, mensagens e UI em **português de Portugal**.
 - **Configuração centralizada**: nada de números mágicos espalhados — vive em
@@ -93,7 +106,7 @@ python scripts/build_pois.py --offline   # mostra o que faria
 - **Escrita atómica por país**: novas camadas devem entrar em `LAYER_KEYS`
   (`build_data.py`) para o manifest as apanhar.
 
-## 8. Resolução de problemas
+## 9. Resolução de problemas
 
 | Sintoma | Causa provável | Solução |
 | --- | --- | --- |
@@ -105,7 +118,7 @@ python scripts/build_pois.py --offline   # mostra o que faria
 | Build aborta "80%" | Extração trouxe poucas barragens | Investiga; usa `--force` só se tiveres a certeza |
 | Alerta de atualização no site | `generated_at` mudou | Comportamento esperado (recarrega a cada 60 s) |
 
-## 9. Fluxo de contribuição sugerido
+## 10. Fluxo de contribuição sugerido
 
 1. Cria um ramo a partir de `main`.
 2. Faz a alteração (frontend e/ou backend).
@@ -114,7 +127,7 @@ python scripts/build_pois.py --offline   # mostra o que faria
    orientação de utilizador.
 5. Abre um *pull request*.
 
-## 10. Documentos-irmãos
+## 11. Documentos-irmãos
 
 - [`README.md`](../README.md) — guia de utilizador (publicar, Notion, limitações).
 - [`PROMPT_DEEPSEEK.md`](../PROMPT_DEEPSEEK.md) — especificação original.
