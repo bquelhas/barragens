@@ -250,4 +250,7 @@ NOTION_OSM_OVERRIDES = {
     # Confirmado pela fonte: barragem no rio Cabrum, 17 m, 4,6 MW, concluída em
     # 1955 (estava em way/190040360, a "Presa do Rei", na Galiza).
     "Freigil": "relation/20692566",        # Barragem de Freigil
+    # "Barragem do Ermal" tem `alt_name` = "Barragem de Guilhofrei" — os dois
+    # nomes do titulo desta pagina (estava na mesma "Presa do Rei").
+    "Ermal / Guilhofrei": "relation/2462599",
 }
