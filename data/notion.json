@@ -6,6 +6,13 @@
     "titulo": "Cabril",
     "url": "https://app.notion.com/p/Cabril-3ec74d9b52a580fcb10dfbd5e3a50f79"
   },
+  "relation/10888990": {
+    "foto_capa": null,
+    "last_edited": "2026-10-16T11:53:00.000Z",
+    "resumo": "",
+    "titulo": "Covão do Meio",
+    "url": "https://app.notion.com/p/Cov-o-do-Meio-3ec74d9b52a5808085dfe29e38dd0ae8"
+  },
   "relation/14193978": {
     "foto_capa": null,
     "last_edited": "2026-10-16T11:20:00.000Z",
@@ -26,6 +33,13 @@
     "resumo": "",
     "titulo": "Carrapatelo",
     "url": "https://app.notion.com/p/Carrapatelo-3ec74d9b52a580ae8677fad467f5ca9a"
+  },
+  "relation/18456918": {
+    "foto_capa": null,
+    "last_edited": "2026-10-16T11:53:00.000Z",
+    "resumo": "",
+    "titulo": "Alto Cávado",
+    "url": "https://app.notion.com/p/Alto-C-vado-3ec74d9b52a580c68ae0ee78dc08fdad"
   },
   "relation/18913985": {
     "foto_capa": null,
@@ -56,14 +70,14 @@
     "url": "https://app.notion.com/p/Fratel-3ec74d9b52a5803ca2ccf4ecaeaf7cb9"
   },
   "relation/2441815": {
-    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/cfa4b8af-8b77-4490-a411-e04c24f639d4/20260111_114540.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466775ZLCN2%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115039Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJHMEUCIBdyMA%2B9YZNNvKWCN%2FCW%2BHF7WR9AHYwfQ3AZY%2FDdlgbeAiEA%2Bp34eAs5wjjz%2BNR3rOO20U9NYuRVhwzeM38iYTCOg0cqiAQI4v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDMGO9G%2Bt%2FEAEqUvu%2FyrcA8KdB9PNwkitardzN89b1reLzHI94riKScEr0j%2FrxkcLPsrV1xOxdDGyvF7bOsOTzB5GWT3nZWZuh0Waia%2FAUb3IP9KEm4MfT%2FTcQ2oB%2FW74E8sjk6mBijAZ7h2A68neQksJu881kOI1WvWTAiygVjEVMsAqQc26EVGQmbZR6tfhiwWlWyn%2BeiD5sHtjmYLqnANU4Dra6y2Cwe960QTbd%2FJ8%2BKoVmjL8irjdXcQg4UeLzZMh55DdAe%2BWW3yI%2B7HckhqL3nLzvDOl0eyYP5yOkdRvFTY9X01dOlLDc%2F3j3wdVeq3Y1e%2F3janAPWf0cCXVWcmsVrB9MuuDcV22xUIgc4%2BZzatFUNwoGDwIyJFVc2Qe%2FDqtp1NZgax0pNYG4li%2BviOetl3mMSeHNXsTMik99ed9wrtUCw7xyWwVzeIferFrugKK9P%2BkxoUoS52MBfuLrYvD4JlPHLF9Knw%2Bi231zzDQrhZ9oEEl6dNCQ9JnVRz%2BSe6nT35gfS4rjHlcPVsSWJW9RNEFUptCInrThT%2Bxyk%2BNXwLrRjxjcJzHCuDDhw4WP3Zc2SCXH7IDldXI6EmWsfSp%2FSwk4zb6Xjo7PVwwlkRTPjOD20f70eqxB6B%2B0HvsBu%2FdwIZRXM3JCeQUMNPUx9YGOqUBzktK3xLh3l3RqY65H3C4abMqMQK7b6%2B1N%2Bn0NvloDgadRhel9i32gUoB7z68d93yNFpg710DnNdpMc8pBAhbp9mKjKMY%2BK7ilEow%2FrXRs3wiTOopDQzeL0Hea73RZkWwq8hBYQ%2Bd4nJDYIypnCIUA%2BkbA%2Bs77dbdHxj0ioB5xuXtZ2yqMlZE%2BQwI45dGUjhFKjFdks0lU2atYLmXxwKhGhqff2ZA&X-Amz-Signature=1e1d571c29157d8300c0fe940b4de01f0ed55f63dd3af9d77ec02d2bcf74be24&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/cfa4b8af-8b77-4490-a411-e04c24f639d4/20260111_114540.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466RI22FD6O%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115345Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJGMEQCIFMCFT6Ccx8wJHIAin5dzT8hU0OTmGKOYqsh8LsBDeapAiB3Nb26iIH0t1fCTIkiVf8owOyTPJiJ6jl5Qx5B4wUDYyqIBAji%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMoQaxkuF3G%2FTsPZQsKtwDBqpRCQJ8NeeruN6TkT8oaIO1l0XpqmmNJrqVyB6CFwf3XGxdu9x2CPSqlCbCEJ%2FGiuQuZma5DDahUpVpPFBqy12AlEeZRzYyCtBbHpAAnUywccbYOWgPRdjo8YI1LMOjSVodNpHNmjwfLKeC09vyUmYOR0C3Ii%2Fvx48WzzQrOY0hxGT1EcUlxtGN2YlRUPPDNrtKOZ9JmvhDUkyuy05bbJ%2BaO11cxSJhu92Lhugn95bbz4jp9ERiDpVLFKLZtW%2BaBhUqBnsCrAEZ0yOhUCVut70BJs5eBYX77WmJZUUOeTT0F9PxCb%2BAudXA5T%2ByzsR8hoP5WXO35oqzErw4V2R4eUTPorgOHoTMfms4N5JmbIQzrddwOEsMv11mRmWRwjGwx4W6MnCfYc3e88R%2F5QRuR3m9ow%2BKvTV9ok%2BnZn8JKheB0iEeXwqbR5jUwu7PhBXeBo%2FxO50rKEQdrH3fv47kbaIu2MLgNvIvLSWzdRNWA%2BVwjQIlDFNK%2BhSkpqKJSvdpbo4tKJdl1aq4luuGxt24atzyLzVcdtbt3MuuPFhFdgtea0nU0RP8VXJM8mLBan8y7NfoqN0Wcqlo9qoEaAj73MDe6QViFDHlOS0rDo6HLoZSF3m92mX4xc7EPcQwq9bH1gY6pgEqJC5oQ0dDWF%2BS%2Fpn8fmr%2F2H0QCUWVTmAhj2a%2FcNEenmztGRHNPXXMk76rWMqG65HnU1oN1ApMY1tnrkSr%2B16pAqzN%2F7QZP7oBUR9YYxaWrbCyq%2BswCMeUDJN98NsBRkjEmMJiNvGj1lEjwXD1twHBT4pphSLr9vy58jLxH7TgKumtoG2XZEnS58lJRZHS2IOpUoV5dvQ6030wssmVE8Qs7d4x%2Fsh5&X-Amz-Signature=c7abfe096efffeb01a742088cb07d8df4efa83815984f00b452004254bcfa2c8&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
     "last_edited": "2026-10-16T11:20:00.000Z",
     "resumo": "",
     "titulo": "Caniçada",
     "url": "https://app.notion.com/p/Cani-ada-3ec74d9b52a58044b291efe6f5104e29"
   },
   "relation/2449098": {
-    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/568cedf6-18ea-4632-96f2-5978817de1c4/IMG_20160920_110946.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466775ZLCN2%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115039Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJHMEUCIBdyMA%2B9YZNNvKWCN%2FCW%2BHF7WR9AHYwfQ3AZY%2FDdlgbeAiEA%2Bp34eAs5wjjz%2BNR3rOO20U9NYuRVhwzeM38iYTCOg0cqiAQI4v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDMGO9G%2Bt%2FEAEqUvu%2FyrcA8KdB9PNwkitardzN89b1reLzHI94riKScEr0j%2FrxkcLPsrV1xOxdDGyvF7bOsOTzB5GWT3nZWZuh0Waia%2FAUb3IP9KEm4MfT%2FTcQ2oB%2FW74E8sjk6mBijAZ7h2A68neQksJu881kOI1WvWTAiygVjEVMsAqQc26EVGQmbZR6tfhiwWlWyn%2BeiD5sHtjmYLqnANU4Dra6y2Cwe960QTbd%2FJ8%2BKoVmjL8irjdXcQg4UeLzZMh55DdAe%2BWW3yI%2B7HckhqL3nLzvDOl0eyYP5yOkdRvFTY9X01dOlLDc%2F3j3wdVeq3Y1e%2F3janAPWf0cCXVWcmsVrB9MuuDcV22xUIgc4%2BZzatFUNwoGDwIyJFVc2Qe%2FDqtp1NZgax0pNYG4li%2BviOetl3mMSeHNXsTMik99ed9wrtUCw7xyWwVzeIferFrugKK9P%2BkxoUoS52MBfuLrYvD4JlPHLF9Knw%2Bi231zzDQrhZ9oEEl6dNCQ9JnVRz%2BSe6nT35gfS4rjHlcPVsSWJW9RNEFUptCInrThT%2Bxyk%2BNXwLrRjxjcJzHCuDDhw4WP3Zc2SCXH7IDldXI6EmWsfSp%2FSwk4zb6Xjo7PVwwlkRTPjOD20f70eqxB6B%2B0HvsBu%2FdwIZRXM3JCeQUMNPUx9YGOqUBzktK3xLh3l3RqY65H3C4abMqMQK7b6%2B1N%2Bn0NvloDgadRhel9i32gUoB7z68d93yNFpg710DnNdpMc8pBAhbp9mKjKMY%2BK7ilEow%2FrXRs3wiTOopDQzeL0Hea73RZkWwq8hBYQ%2Bd4nJDYIypnCIUA%2BkbA%2Bs77dbdHxj0ioB5xuXtZ2yqMlZE%2BQwI45dGUjhFKjFdks0lU2atYLmXxwKhGhqff2ZA&X-Amz-Signature=000f57dba49b0e30dea1d85640781da71f960a09659d0384008d130b14998a1a&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/568cedf6-18ea-4632-96f2-5978817de1c4/IMG_20160920_110946.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466RI22FD6O%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115345Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJGMEQCIFMCFT6Ccx8wJHIAin5dzT8hU0OTmGKOYqsh8LsBDeapAiB3Nb26iIH0t1fCTIkiVf8owOyTPJiJ6jl5Qx5B4wUDYyqIBAji%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMoQaxkuF3G%2FTsPZQsKtwDBqpRCQJ8NeeruN6TkT8oaIO1l0XpqmmNJrqVyB6CFwf3XGxdu9x2CPSqlCbCEJ%2FGiuQuZma5DDahUpVpPFBqy12AlEeZRzYyCtBbHpAAnUywccbYOWgPRdjo8YI1LMOjSVodNpHNmjwfLKeC09vyUmYOR0C3Ii%2Fvx48WzzQrOY0hxGT1EcUlxtGN2YlRUPPDNrtKOZ9JmvhDUkyuy05bbJ%2BaO11cxSJhu92Lhugn95bbz4jp9ERiDpVLFKLZtW%2BaBhUqBnsCrAEZ0yOhUCVut70BJs5eBYX77WmJZUUOeTT0F9PxCb%2BAudXA5T%2ByzsR8hoP5WXO35oqzErw4V2R4eUTPorgOHoTMfms4N5JmbIQzrddwOEsMv11mRmWRwjGwx4W6MnCfYc3e88R%2F5QRuR3m9ow%2BKvTV9ok%2BnZn8JKheB0iEeXwqbR5jUwu7PhBXeBo%2FxO50rKEQdrH3fv47kbaIu2MLgNvIvLSWzdRNWA%2BVwjQIlDFNK%2BhSkpqKJSvdpbo4tKJdl1aq4luuGxt24atzyLzVcdtbt3MuuPFhFdgtea0nU0RP8VXJM8mLBan8y7NfoqN0Wcqlo9qoEaAj73MDe6QViFDHlOS0rDo6HLoZSF3m92mX4xc7EPcQwq9bH1gY6pgEqJC5oQ0dDWF%2BS%2Fpn8fmr%2F2H0QCUWVTmAhj2a%2FcNEenmztGRHNPXXMk76rWMqG65HnU1oN1ApMY1tnrkSr%2B16pAqzN%2F7QZP7oBUR9YYxaWrbCyq%2BswCMeUDJN98NsBRkjEmMJiNvGj1lEjwXD1twHBT4pphSLr9vy58jLxH7TgKumtoG2XZEnS58lJRZHS2IOpUoV5dvQ6030wssmVE8Qs7d4x%2Fsh5&X-Amz-Signature=244b62fbfd9c43c01f1bb0f040c502fe2afb4e3f758ee3ade3002bd6da08781f&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
     "last_edited": "2026-10-16T11:20:00.000Z",
     "resumo": "",
     "titulo": "Alto Rabagão",
@@ -76,19 +90,26 @@
     "titulo": "Andorinhas",
     "url": "https://app.notion.com/p/Andorinhas-3ec74d9b52a580f9a30ce2d3803b8034"
   },
+  "relation/2520396": {
+    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/b0cdb786-f955-4f34-9fdc-0f0954539020/20260928_105809.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466RI22FD6O%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115345Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJGMEQCIFMCFT6Ccx8wJHIAin5dzT8hU0OTmGKOYqsh8LsBDeapAiB3Nb26iIH0t1fCTIkiVf8owOyTPJiJ6jl5Qx5B4wUDYyqIBAji%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMoQaxkuF3G%2FTsPZQsKtwDBqpRCQJ8NeeruN6TkT8oaIO1l0XpqmmNJrqVyB6CFwf3XGxdu9x2CPSqlCbCEJ%2FGiuQuZma5DDahUpVpPFBqy12AlEeZRzYyCtBbHpAAnUywccbYOWgPRdjo8YI1LMOjSVodNpHNmjwfLKeC09vyUmYOR0C3Ii%2Fvx48WzzQrOY0hxGT1EcUlxtGN2YlRUPPDNrtKOZ9JmvhDUkyuy05bbJ%2BaO11cxSJhu92Lhugn95bbz4jp9ERiDpVLFKLZtW%2BaBhUqBnsCrAEZ0yOhUCVut70BJs5eBYX77WmJZUUOeTT0F9PxCb%2BAudXA5T%2ByzsR8hoP5WXO35oqzErw4V2R4eUTPorgOHoTMfms4N5JmbIQzrddwOEsMv11mRmWRwjGwx4W6MnCfYc3e88R%2F5QRuR3m9ow%2BKvTV9ok%2BnZn8JKheB0iEeXwqbR5jUwu7PhBXeBo%2FxO50rKEQdrH3fv47kbaIu2MLgNvIvLSWzdRNWA%2BVwjQIlDFNK%2BhSkpqKJSvdpbo4tKJdl1aq4luuGxt24atzyLzVcdtbt3MuuPFhFdgtea0nU0RP8VXJM8mLBan8y7NfoqN0Wcqlo9qoEaAj73MDe6QViFDHlOS0rDo6HLoZSF3m92mX4xc7EPcQwq9bH1gY6pgEqJC5oQ0dDWF%2BS%2Fpn8fmr%2F2H0QCUWVTmAhj2a%2FcNEenmztGRHNPXXMk76rWMqG65HnU1oN1ApMY1tnrkSr%2B16pAqzN%2F7QZP7oBUR9YYxaWrbCyq%2BswCMeUDJN98NsBRkjEmMJiNvGj1lEjwXD1twHBT4pphSLr9vy58jLxH7TgKumtoG2XZEnS58lJRZHS2IOpUoV5dvQ6030wssmVE8Qs7d4x%2Fsh5&X-Amz-Signature=e4eb51163c84ab74ae4fd28117c0f326419194b17ac304b592c129cbb9c8366c&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+    "last_edited": "2026-10-16T11:53:00.000Z",
+    "resumo": "",
+    "titulo": "Picote",
+    "url": "https://app.notion.com/p/Picote-3ec74d9b52a580aeabc4d83afa74380e"
+  },
+  "relation/2915548": {
+    "foto_capa": null,
+    "last_edited": "2026-10-16T11:53:00.000Z",
+    "resumo": "",
+    "titulo": "Valeira",
+    "url": "https://app.notion.com/p/Valeira-3f474d9b52a5809b9b1ce3cf18ae5dd0"
+  },
   "relation/2915595": {
     "foto_capa": null,
     "last_edited": "2026-10-16T11:49:00.000Z",
     "resumo": "",
     "titulo": "Régua",
     "url": "https://app.notion.com/p/R-gua-3ec74d9b52a58013b553e292d3c7680c"
-  },
-  "way/102327780": {
-    "foto_capa": null,
-    "last_edited": "2026-10-16T10:24:00.000Z",
-    "resumo": "",
-    "titulo": "Covão do Meio",
-    "url": "https://app.notion.com/p/Cov-o-do-Meio-3ec74d9b52a5808085dfe29e38dd0ae8"
   },
   "way/105611893": {
     "foto_capa": null,
@@ -174,13 +195,6 @@
     "titulo": "Maranhão",
     "url": "https://app.notion.com/p/Maranh-o-3ec74d9b52a5803fa059d02261f5f3c5"
   },
-  "way/275074814": {
-    "foto_capa": null,
-    "last_edited": "2026-10-16T10:43:00.000Z",
-    "resumo": "",
-    "titulo": "Alto Cávado",
-    "url": "https://app.notion.com/p/Alto-C-vado-3ec74d9b52a580c68ae0ee78dc08fdad"
-  },
   "way/291679214": {
     "foto_capa": null,
     "last_edited": "2026-10-16T10:24:00.000Z",
@@ -244,13 +258,6 @@
     "titulo": "Belver",
     "url": "https://app.notion.com/p/Belver-3ec74d9b52a58002a2c4fa5bbb04acb8"
   },
-  "way/382753042": {
-    "foto_capa": null,
-    "last_edited": "2026-10-16T10:24:00.000Z",
-    "resumo": "",
-    "titulo": "Valeira",
-    "url": "https://app.notion.com/p/Valeira-3f474d9b52a5809b9b1ce3cf18ae5dd0"
-  },
   "way/51181698": {
     "foto_capa": null,
     "last_edited": "2026-10-16T10:24:00.000Z",
@@ -294,7 +301,7 @@
     "url": "https://app.notion.com/p/Daroeira-3ec74d9b52a580f9ac83fd0c8f88fa78"
   },
   "way/71588050": {
-    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/76de3f66-72f2-4c4a-acb2-c445f7da835d/20230524_193721.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466775ZLCN2%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115039Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJHMEUCIBdyMA%2B9YZNNvKWCN%2FCW%2BHF7WR9AHYwfQ3AZY%2FDdlgbeAiEA%2Bp34eAs5wjjz%2BNR3rOO20U9NYuRVhwzeM38iYTCOg0cqiAQI4v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDMGO9G%2Bt%2FEAEqUvu%2FyrcA8KdB9PNwkitardzN89b1reLzHI94riKScEr0j%2FrxkcLPsrV1xOxdDGyvF7bOsOTzB5GWT3nZWZuh0Waia%2FAUb3IP9KEm4MfT%2FTcQ2oB%2FW74E8sjk6mBijAZ7h2A68neQksJu881kOI1WvWTAiygVjEVMsAqQc26EVGQmbZR6tfhiwWlWyn%2BeiD5sHtjmYLqnANU4Dra6y2Cwe960QTbd%2FJ8%2BKoVmjL8irjdXcQg4UeLzZMh55DdAe%2BWW3yI%2B7HckhqL3nLzvDOl0eyYP5yOkdRvFTY9X01dOlLDc%2F3j3wdVeq3Y1e%2F3janAPWf0cCXVWcmsVrB9MuuDcV22xUIgc4%2BZzatFUNwoGDwIyJFVc2Qe%2FDqtp1NZgax0pNYG4li%2BviOetl3mMSeHNXsTMik99ed9wrtUCw7xyWwVzeIferFrugKK9P%2BkxoUoS52MBfuLrYvD4JlPHLF9Knw%2Bi231zzDQrhZ9oEEl6dNCQ9JnVRz%2BSe6nT35gfS4rjHlcPVsSWJW9RNEFUptCInrThT%2Bxyk%2BNXwLrRjxjcJzHCuDDhw4WP3Zc2SCXH7IDldXI6EmWsfSp%2FSwk4zb6Xjo7PVwwlkRTPjOD20f70eqxB6B%2B0HvsBu%2FdwIZRXM3JCeQUMNPUx9YGOqUBzktK3xLh3l3RqY65H3C4abMqMQK7b6%2B1N%2Bn0NvloDgadRhel9i32gUoB7z68d93yNFpg710DnNdpMc8pBAhbp9mKjKMY%2BK7ilEow%2FrXRs3wiTOopDQzeL0Hea73RZkWwq8hBYQ%2Bd4nJDYIypnCIUA%2BkbA%2Bs77dbdHxj0ioB5xuXtZ2yqMlZE%2BQwI45dGUjhFKjFdks0lU2atYLmXxwKhGhqff2ZA&X-Amz-Signature=788662f1ae4fc572aa610f96d255d647365172cbbd83082142e73f9b4265fdf9&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/76de3f66-72f2-4c4a-acb2-c445f7da835d/20230524_193721.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466RI22FD6O%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115345Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJGMEQCIFMCFT6Ccx8wJHIAin5dzT8hU0OTmGKOYqsh8LsBDeapAiB3Nb26iIH0t1fCTIkiVf8owOyTPJiJ6jl5Qx5B4wUDYyqIBAji%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMoQaxkuF3G%2FTsPZQsKtwDBqpRCQJ8NeeruN6TkT8oaIO1l0XpqmmNJrqVyB6CFwf3XGxdu9x2CPSqlCbCEJ%2FGiuQuZma5DDahUpVpPFBqy12AlEeZRzYyCtBbHpAAnUywccbYOWgPRdjo8YI1LMOjSVodNpHNmjwfLKeC09vyUmYOR0C3Ii%2Fvx48WzzQrOY0hxGT1EcUlxtGN2YlRUPPDNrtKOZ9JmvhDUkyuy05bbJ%2BaO11cxSJhu92Lhugn95bbz4jp9ERiDpVLFKLZtW%2BaBhUqBnsCrAEZ0yOhUCVut70BJs5eBYX77WmJZUUOeTT0F9PxCb%2BAudXA5T%2ByzsR8hoP5WXO35oqzErw4V2R4eUTPorgOHoTMfms4N5JmbIQzrddwOEsMv11mRmWRwjGwx4W6MnCfYc3e88R%2F5QRuR3m9ow%2BKvTV9ok%2BnZn8JKheB0iEeXwqbR5jUwu7PhBXeBo%2FxO50rKEQdrH3fv47kbaIu2MLgNvIvLSWzdRNWA%2BVwjQIlDFNK%2BhSkpqKJSvdpbo4tKJdl1aq4luuGxt24atzyLzVcdtbt3MuuPFhFdgtea0nU0RP8VXJM8mLBan8y7NfoqN0Wcqlo9qoEaAj73MDe6QViFDHlOS0rDo6HLoZSF3m92mX4xc7EPcQwq9bH1gY6pgEqJC5oQ0dDWF%2BS%2Fpn8fmr%2F2H0QCUWVTmAhj2a%2FcNEenmztGRHNPXXMk76rWMqG65HnU1oN1ApMY1tnrkSr%2B16pAqzN%2F7QZP7oBUR9YYxaWrbCyq%2BswCMeUDJN98NsBRkjEmMJiNvGj1lEjwXD1twHBT4pphSLr9vy58jLxH7TgKumtoG2XZEnS58lJRZHS2IOpUoV5dvQ6030wssmVE8Qs7d4x%2Fsh5&X-Amz-Signature=3a3a48cbe93cde7c05478ebb3924ab416896bfcc11609c43a0d31b632b70f643&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
     "last_edited": "2026-10-16T11:48:00.000Z",
     "resumo": "",
     "titulo": "Miranda do Douro",
@@ -322,7 +329,7 @@
     "url": "https://app.notion.com/p/Pracana-3ec74d9b52a580b5865fe36df242f44a"
   },
   "way/96917700": {
-    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/0d6de687-7607-4e1c-a12b-7f872b6b1d7b/20240128_121410.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466775ZLCN2%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115039Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJHMEUCIBdyMA%2B9YZNNvKWCN%2FCW%2BHF7WR9AHYwfQ3AZY%2FDdlgbeAiEA%2Bp34eAs5wjjz%2BNR3rOO20U9NYuRVhwzeM38iYTCOg0cqiAQI4v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDMGO9G%2Bt%2FEAEqUvu%2FyrcA8KdB9PNwkitardzN89b1reLzHI94riKScEr0j%2FrxkcLPsrV1xOxdDGyvF7bOsOTzB5GWT3nZWZuh0Waia%2FAUb3IP9KEm4MfT%2FTcQ2oB%2FW74E8sjk6mBijAZ7h2A68neQksJu881kOI1WvWTAiygVjEVMsAqQc26EVGQmbZR6tfhiwWlWyn%2BeiD5sHtjmYLqnANU4Dra6y2Cwe960QTbd%2FJ8%2BKoVmjL8irjdXcQg4UeLzZMh55DdAe%2BWW3yI%2B7HckhqL3nLzvDOl0eyYP5yOkdRvFTY9X01dOlLDc%2F3j3wdVeq3Y1e%2F3janAPWf0cCXVWcmsVrB9MuuDcV22xUIgc4%2BZzatFUNwoGDwIyJFVc2Qe%2FDqtp1NZgax0pNYG4li%2BviOetl3mMSeHNXsTMik99ed9wrtUCw7xyWwVzeIferFrugKK9P%2BkxoUoS52MBfuLrYvD4JlPHLF9Knw%2Bi231zzDQrhZ9oEEl6dNCQ9JnVRz%2BSe6nT35gfS4rjHlcPVsSWJW9RNEFUptCInrThT%2Bxyk%2BNXwLrRjxjcJzHCuDDhw4WP3Zc2SCXH7IDldXI6EmWsfSp%2FSwk4zb6Xjo7PVwwlkRTPjOD20f70eqxB6B%2B0HvsBu%2FdwIZRXM3JCeQUMNPUx9YGOqUBzktK3xLh3l3RqY65H3C4abMqMQK7b6%2B1N%2Bn0NvloDgadRhel9i32gUoB7z68d93yNFpg710DnNdpMc8pBAhbp9mKjKMY%2BK7ilEow%2FrXRs3wiTOopDQzeL0Hea73RZkWwq8hBYQ%2Bd4nJDYIypnCIUA%2BkbA%2Bs77dbdHxj0ioB5xuXtZ2yqMlZE%2BQwI45dGUjhFKjFdks0lU2atYLmXxwKhGhqff2ZA&X-Amz-Signature=c75dd33580f064d91afed76926cc6c460cde041369aa5928e45addb8784ddeab&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+    "foto_capa": "https://prod-files-secure.s3.us-west-2.amazonaws.com/8a817c08-bf38-4be7-8212-c7ffe8711ca0/0d6de687-7607-4e1c-a12b-7f872b6b1d7b/20240128_121410.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466RI22FD6O%2F20261016%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261016T115345Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBkaCXVzLXdlc3QtMiJGMEQCIFMCFT6Ccx8wJHIAin5dzT8hU0OTmGKOYqsh8LsBDeapAiB3Nb26iIH0t1fCTIkiVf8owOyTPJiJ6jl5Qx5B4wUDYyqIBAji%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMoQaxkuF3G%2FTsPZQsKtwDBqpRCQJ8NeeruN6TkT8oaIO1l0XpqmmNJrqVyB6CFwf3XGxdu9x2CPSqlCbCEJ%2FGiuQuZma5DDahUpVpPFBqy12AlEeZRzYyCtBbHpAAnUywccbYOWgPRdjo8YI1LMOjSVodNpHNmjwfLKeC09vyUmYOR0C3Ii%2Fvx48WzzQrOY0hxGT1EcUlxtGN2YlRUPPDNrtKOZ9JmvhDUkyuy05bbJ%2BaO11cxSJhu92Lhugn95bbz4jp9ERiDpVLFKLZtW%2BaBhUqBnsCrAEZ0yOhUCVut70BJs5eBYX77WmJZUUOeTT0F9PxCb%2BAudXA5T%2ByzsR8hoP5WXO35oqzErw4V2R4eUTPorgOHoTMfms4N5JmbIQzrddwOEsMv11mRmWRwjGwx4W6MnCfYc3e88R%2F5QRuR3m9ow%2BKvTV9ok%2BnZn8JKheB0iEeXwqbR5jUwu7PhBXeBo%2FxO50rKEQdrH3fv47kbaIu2MLgNvIvLSWzdRNWA%2BVwjQIlDFNK%2BhSkpqKJSvdpbo4tKJdl1aq4luuGxt24atzyLzVcdtbt3MuuPFhFdgtea0nU0RP8VXJM8mLBan8y7NfoqN0Wcqlo9qoEaAj73MDe6QViFDHlOS0rDo6HLoZSF3m92mX4xc7EPcQwq9bH1gY6pgEqJC5oQ0dDWF%2BS%2Fpn8fmr%2F2H0QCUWVTmAhj2a%2FcNEenmztGRHNPXXMk76rWMqG65HnU1oN1ApMY1tnrkSr%2B16pAqzN%2F7QZP7oBUR9YYxaWrbCyq%2BswCMeUDJN98NsBRkjEmMJiNvGj1lEjwXD1twHBT4pphSLr9vy58jLxH7TgKumtoG2XZEnS58lJRZHS2IOpUoV5dvQ6030wssmVE8Qs7d4x%2Fsh5&X-Amz-Signature=ca68d4cb41b78adb9dfac659ae6dafb12406d3d680964f984e64a9fee078b6ee&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
     "last_edited": "2026-10-16T10:24:00.000Z",
     "resumo": "",
     "titulo": "Aguieira",
