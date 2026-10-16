@@ -37,10 +37,10 @@ chave:
 ```
 
 O código `AS `/`BN ` do título, a caixa e os acentos são ignorados na procura. A
-ligação manual só é usada quando o automático falha, e **nunca sobrepõe** um
-valor que já aponte para uma barragem válida (para não desfazer escolhas feitas
-no Notion). Serve as duas leituras: preenche a coluna `OSM` (barragens) e liga
-as aldeias/bairros à barragem certa.
+lista **manda**: se o valor da página for diferente do indicado, é corrigido
+(senão não se mexe). Serve as duas leituras: preenche a coluna `OSM`
+(barragens) e liga as aldeias/bairros à barragem certa. Para deixar de corrigir
+uma página, basta tirá-la da lista.
 
 ### Lado do código (`fetch_notion.py`)
 

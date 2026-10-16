@@ -217,15 +217,16 @@ NOTION_SUMMARY_PROPERTY = "Resumo"
 # Domínio público do Notion (usado para converter URLs internas).
 NOTION_PUBLIC_DOMAIN = "notion.site"
 
-# Ligações definidas à mão página → barragem, para os poucos casos em que o
-# casamento automático não chega: nome ambíguo (várias barragens com o mesmo
-# nome), nome sem correspondência, um id que aponta para outra coisa, ou uma
-# aldeia/bairro sem a barragem-mãe ligada na base.
+# Ligações definidas à mão página → barragem, para os casos em que o casamento
+# automático não chega ou dá o resultado errado: nome ambíguo (várias barragens
+# com o mesmo nome), nome sem correspondência, id que aponta para outra
+# barragem, ou uma aldeia/bairro sem a barragem-mãe ligada na base.
 #
 # Chave = título da página tal como está no Notion (o código inicial `AS `/`BN `
-# é ignorado). Valor = id do OpenStreetMap, no formato `tipo/id`.
-# Só é usado quando o automático falha, e nunca sobrepõe um valor que já aponte
-# para uma barragem válida.
+# é ignorado; caixa e acentos também). Valor = id do OpenStreetMap, `tipo/id`.
+#
+# A lista MANDA: se o valor da página for diferente, é corrigido. Para deixar de
+# corrigir uma página, basta tirá-la daqui.
 NOTION_OSM_OVERRIDES = {
     # Nome ambíguo nos dados (3 ou 2 candidatos).
     "Fratel": "relation/2431469",
@@ -235,10 +236,18 @@ NOTION_OSM_OVERRIDES = {
     # Sem correspondência por nome.
     "Facho/Vareta": "way/1232230351",      # Barragem do Facho II
     "Bravura/Odiáxere": "way/159677144",   # Barragem de Odeáxere
-    # Id existente que aponta para um açude sem nome.
-    # (A chave é o título da página tal como está na base: "Régua".)
-    "Régua": "relation/2915595",
     # Aldeia/bairro sem a barragem-mãe ligada na base.
     "AS Vilarinho de Negrões": "relation/2449098",   # Barragem do Alto Rabagão
     "BN Belver": "way/369746884",
+    # Correções: o id que lá estava apontava para outra barragem (a associação
+    # automática trocou-as — quase sempre com barragens de Espanha, por causa
+    # dos nomes das albufeiras em cascata no Douro).
+    "Régua": "relation/2915595",           # apontava para um açude sem nome
+    "Picote": "relation/2520396",          # Barragem de Picote (estava na de Miranda)
+    "Valeira": "relation/2915548",         # Barragem da Valeira (estava em "Embalse del Val")
+    "Alto Cávado": "relation/18456918",    # Barragem do Alto Cávado
+    "Covão do Meio": "relation/10888990",  # Barragem de Covão do Meio
+    # POR CONFIRMAR — não mexer sem resposta: "Freigil" tem hoje
+    # way/190040360 ("Presa do Rei", Galiza); suspeita-se que seja a Barragem
+    # do Ermal (relation/2462599).
 }

@@ -352,15 +352,14 @@ def main():
 
         existing = page_existing_id(page)
 
-        # Ligação definida à mão (nome ambíguo, sem correspondência, ou um id
-        # que aponta para outra coisa). Não sobrepõe um valor que já aponte para
-        # uma barragem válida, para não desfazer escolhas feitas no Notion.
+        # Ligação definida à mão (nome ambíguo, sem correspondência, id que
+        # aponta para outra barragem). A lista manda: se o valor for diferente,
+        # é corrigido.
         manual = notion_ids.manual_dam(titulo)
         if manual and not resolver.resolve(manual)[0]:
             log(f"[aviso] {titulo}: id manual {manual} não existe nos dados — ignorado.")
             manual = None
-        atual = notion_ids.normalize_osm_id(existing)
-        if manual and manual != atual and not (atual and resolver.resolve(atual)[0]):
+        if manual and manual != notion_ids.normalize_osm_id(existing):
             if args.apply:
                 try:
                     set_page_osm(token, page_id, osm_value(manual, prop_kind), prop_kind)
