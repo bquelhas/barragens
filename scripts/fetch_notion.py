@@ -58,7 +58,7 @@ def log(msg: str):
 
 
 def text_of(prop: dict | None) -> str:
-    """Texto simples de uma propriedade Notion (rich_text/title/select/...)."""
+    """Texto simples de uma propriedade Notion (vários tipos)."""
     if not prop:
         return ""
     kind = prop.get("type")
@@ -67,8 +67,22 @@ def text_of(prop: dict | None) -> str:
     if kind in ("select", "status"):
         val = prop.get(kind) or {}
         return (val.get("name") or "").strip()
-    if kind == "url":
-        return (prop.get("url") or "").strip()
+    if kind in ("url", "email", "phone_number"):
+        return (prop.get(kind) or "").strip()
+    if kind == "number":
+        v = prop.get("number")
+        return "" if v is None else str(v)
+    if kind == "date":
+        return ((prop.get("date") or {}).get("start") or "").strip()
+    if kind == "multi_select":
+        return ", ".join(o.get("name", "") for o in prop.get("multi_select", []))
+    if kind in ("formula", "rollup"):
+        inner = prop.get(kind) or {}
+        return text_of(inner) if isinstance(inner, dict) else ""
+    if kind == "string":
+        return (prop.get("string") or "").strip()
+    if kind == "boolean":
+        return str(prop.get("boolean"))
     return ""
 
 
