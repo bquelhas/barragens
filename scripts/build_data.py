@@ -245,13 +245,16 @@ def build_dams(features: list[dict], country: str) -> list[dict]:
             parent[rj] = ri
 
     # Junta features até 300 m cujo nome normalizado coincide (ou uma sem nome).
+    # Exceção: mesmo com nomes diferentes, junta se as geometrias se
+    # sobrepuserem — é a mesma estrutura mapeada como linha + área/relação
+    # (evita marcadores duplicados, ex.: Picote relação + linha).
     for i, geom in enumerate(metric_geoms):
         name_i = normalize_name(features[i]["tags"].get("name"))
         for j in tree.query(geom.buffer(300)):
             if j <= i:
                 continue
             name_j = normalize_name(features[j]["tags"].get("name"))
-            if name_i and name_j and name_i != name_j:
+            if name_i and name_j and name_i != name_j and not geom.intersects(metric_geoms[j]):
                 continue
             union(i, j)
 
