@@ -236,7 +236,8 @@ NOTION_OSM_OVERRIDES = {
     "Facho/Vareta": "way/1232230351",      # Barragem do Facho II
     "Bravura/Odiáxere": "way/159677144",   # Barragem de Odeáxere
     # Id existente que aponta para um açude sem nome.
-    "Barragem da Régua": "relation/2915595",
+    # (A chave é o título da página tal como está na base: "Régua".)
+    "Régua": "relation/2915595",
     # Aldeia/bairro sem a barragem-mãe ligada na base.
     "AS Vilarinho de Negrões": "relation/2449098",   # Barragem do Alto Rabagão
     "BN Belver": "way/369746884",
