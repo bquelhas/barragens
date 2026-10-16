@@ -4,7 +4,7 @@
 
 import {
   LAYERS, USO_COLORS, USO_ORDER, PALETTE, CLUSTER, DAM_ICON, RELATED, HILLSHADE,
-  CONFIANCA_COLORS, CONFIANCA_ORDER,
+  CONTOURS, CONFIANCA_COLORS, CONFIANCA_ORDER,
 } from "./config.js";
 import { fetchJson, distanceM, distanceToGeometryM, pointOf, normalize } from "./utils.js";
 
@@ -34,6 +34,7 @@ export const damsSourceId = "src-dams";
 export function init(opts) {
   Object.assign(state, opts);
   addHillshade();
+  addContours();
   attenuateBaseMap();
   buildReservoirHighlight();
   buildRelatedHighlight();
@@ -64,6 +65,103 @@ function addHillshade() {
     }
   } catch (err) {
     console.warn("Hillshade:", err);
+  }
+}
+
+// ---------------------------------------------------------------------
+// Curvas de nível (maplibre-contour, calculadas no browser)
+// ---------------------------------------------------------------------
+
+// Fonte de elevação partilhada: criada uma só vez, para a cache de tiles de
+// relevo sobreviver às reconstruções (mudança de tema).
+let demSource = null;
+
+function ensureDemSource() {
+  const lib = globalThis.mlcontour;
+  if (!lib) {
+    console.warn("Curvas de nível: a biblioteca maplibre-contour não carregou.");
+    return null;
+  }
+  if (!demSource) {
+    demSource = new lib.DemSource({
+      url: HILLSHADE.tiles,          // as mesmas tiles do relevo
+      encoding: CONTOURS.encoding,
+      maxzoom: CONTOURS.maxzoom,
+      worker: CONTOURS.worker,
+      cacheSize: CONTOURS.cacheSize,
+      timeoutMs: CONTOURS.timeoutMs,
+    });
+    demSource.setupMaplibre(maplibregl);
+  }
+  return demSource;
+}
+
+/**
+ * Curvas de nível a partir das tiles de relevo, com intervalos por zoom.
+ * Substitui o `hillshade` como leitura do terreno.
+ */
+function addContours() {
+  if (!CONTOURS.enabled) return;
+  const map = state.map;
+  const dem = ensureDemSource();
+  if (!dem) return;
+
+  try {
+    const t = document.documentElement.dataset.theme;
+    const colors = CONTOURS.colors[t === "dark" ? "dark" : "light"];
+
+    if (!map.getSource("contours")) {
+      map.addSource("contours", {
+        type: "vector",
+        tiles: [dem.contourProtocolUrl({
+          multiplier: 1,                     // metros (o DEM já está em metros)
+          thresholds: CONTOURS.thresholds,
+          contourLayer: "contours",
+        })],
+        maxzoom: CONTOURS.sourceMaxzoom,
+        attribution: HILLSHADE.attribution,
+      });
+    }
+
+    if (!map.getLayer("contours-lines")) {
+      map.addLayer({
+        id: "contours-lines", type: "line", source: "contours",
+        "source-layer": "contours",
+        // Sem as cotas negativas (batimetria): o mar fica sem linhas.
+        filter: [">", ["get", "ele"], CONTOURS.minElevation],
+        paint: {
+          // `level` = índice mais alto dos intervalos de que a cota é múltipla:
+          // 0 = linha menor, 1 = linha mestra.
+          "line-color": ["match", ["get", "level"], 0, colors.minor, colors.major],
+          "line-width": ["match", ["get", "level"], 0, 0.5, 1.1],
+          "line-opacity": CONTOURS.opacity,
+        },
+      });
+    }
+
+    if (!map.getLayer("contours-labels")) {
+      map.addLayer({
+        id: "contours-labels", type: "symbol", source: "contours",
+        "source-layer": "contours",
+        minzoom: CONTOURS.labelMinzoom,
+        filter: ["all", [">", ["get", "level"], 0],
+                        [">", ["get", "ele"], CONTOURS.minElevation]],
+        layout: {
+          "symbol-placement": "line",
+          "text-field": ["concat",
+            ["number-format", ["get", "ele"], { "max-fraction-digits": 0 }], " m"],
+          "text-size": 10,
+          "text-font": [CONTOURS.labelFont],
+        },
+        paint: {
+          "text-color": colors.label,
+          "text-halo-color": t === "dark" ? "#111111" : "#ffffff",
+          "text-halo-width": 1.2,
+        },
+      });
+    }
+  } catch (err) {
+    console.warn("Curvas de nível:", err);
   }
 }
 
@@ -676,6 +774,7 @@ export function rebuildAfterStyleChange() {
   const map = state.map;
   state.loaded.clear();
   addHillshade();
+  addContours();
   attenuateBaseMap();
   buildReservoirHighlight();
   buildRelatedHighlight();

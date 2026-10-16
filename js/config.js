@@ -107,14 +107,53 @@ export const RELATED = {
 };
 
 // --- Hillshade (B10) -------------------------------------------------
+// Desligado por omissão: o relevo é dado pelas curvas de nível (`CONTOURS`).
+// Continua disponível (e partilha as mesmas tiles de elevação).
 export const HILLSHADE = {
-  enabled: true,
+  enabled: false,
   tiles: "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
   encoding: "terrarium",
   tileSize: 256,
   maxzoom: 13,
   exaggeration: 0.35,
   attribution: "Relevo: Terrain Tiles (AWS/Mapzen, CC-BY)",
+};
+
+// --- Curvas de nível (maplibre-contour) ------------------------------
+// Geradas **no browser** a partir das mesmas tiles de relevo do hillshade
+// (biblioteca `maplibre-contour`, carregada por CDN em `index.html`). Só
+// funciona com ligação à rede; se a biblioteca falhar, o mapa segue sem curvas.
+// `terrarium` é o formato nativo do plugin e o das tiles que já usamos.
+export const CONTOURS = {
+  enabled: true,
+  encoding: "terrarium",   // "terrarium" (AWS/Mapzen) | "mapbox"
+  maxzoom: 13,             // zoom máximo das tiles de relevo (igual ao DEM)
+  sourceMaxzoom: 15,       // zoom máximo a que o MapLibre pede tiles ao plugin
+  worker: true,            // calcular num web worker (não bloqueia o interface)
+  cacheSize: 100,          // tiles de relevo guardadas em memória
+  timeoutMs: 10000,
+  // Intervalos por zoom, em metros: [menor, mestra]. A mestra tem de ser
+  // múltipla da menor — é isso que a distingue nas linhas e nos rótulos.
+  // Aos zooms mais afastados os intervalos são largos de propósito: linhas de
+  // 10 m sobre a Península inteira seriam uma mancha.
+  thresholds: {
+    3: [500, 1000], 4: [500, 1000], 5: [500, 1000], 6: [200, 1000],
+    7: [200, 1000], 8: [200, 500], 9: [100, 500], 10: [100, 500],
+    11: [50, 250], 12: [25, 100], 13: [10, 50], 14: [10, 50], 15: [10, 50],
+  },
+  // Cores por tema (o mapa base é claro ou escuro).
+  colors: {
+    light: { minor: "#b6a692", major: "#8a755c", label: "#6b5c47" },
+    dark: { minor: "#5f5748", major: "#8d8067", label: "#cbbfa5" },
+  },
+  opacity: 0.45,
+  // As tiles de relevo incluem batimetria (cotas negativas no oceano). Só
+  // interessam as cotas acima deste valor, para o mar ficar limpo.
+  minElevation: 0,
+  // Rótulos das cotas: só nas linhas mestras e a partir deste zoom.
+  // "Noto Sans Regular" é a única fonte que os estilos claro e escuro servem.
+  labelMinzoom: 12,
+  labelFont: "Noto Sans Regular",
 };
 
 // --- Destaques (E16) -------------------------------------------------

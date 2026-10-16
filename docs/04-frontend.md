@@ -1,7 +1,8 @@
 # 04 — Frontend
 
 O site é **HTML + CSS + JavaScript vanilla** (módulos ES), sem framework e sem
-passo de build. Carrega **MapLibre GL JS** e as fontes via CDN.
+passo de build. Carrega **MapLibre GL JS**, o **maplibre-contour** (curvas de
+nível) e as fontes via CDN.
 
 ## 1. Estrutura
 
@@ -98,8 +99,14 @@ Estado interno (`state`): `loaded`, `loading`, `data`, `visible`, `filters`,
 - **Mapa base atenuado** (`attenuateBaseMap`): baixa a opacidade de POIs e
   estradas secundárias do estilo do OpenFreeMap (heurística por id/tipo,
   defensiva).
-- **Relevo** (`addHillshade`): fonte `raster-dem` (Terrarium) + camada
-  `hillshade` subtil.
+- **Curvas de nível** (`addContours`): a biblioteca `maplibre-contour` (CDN em
+  `index.html`) gera tiles vetoriais de isolinhas **no browser**, a partir das
+  mesmas tiles de relevo Terrarium — sem servidor e sem ficheiros no repositório.
+  Camadas `contours-lines` e `contours-labels` (cotas só nas linhas mestras, a
+  partir de `labelMinzoom`); intervalo por zoom em `CONTOURS.thresholds`. Sem
+  cotas negativas (batimetria): o mar fica limpo. Cores por tema.
+- **Relevo** (`addHillshade`): camada `hillshade` sobre a mesma fonte de
+  elevação — **desligada por omissão** (`HILLSHADE.enabled: false`).
 - **Destaque da albufeira** (`buildReservoirHighlight`): source/layers próprios
   filtrados por `reservoir_id`.
 - **Rede elétrica relacionada** (`buildRelatedHighlight`): `src-related` +
@@ -184,7 +191,8 @@ Aplicam-se às **barragens individuais** via `setFilter`:
 | Centro/zoom, estilos do mapa base | `js/config.js` → `MAP` |
 | Cores de uso / confiança | `js/config.js` → `USO_COLORS`, `CONFIANCA_COLORS` |
 | Camadas, `minzoom`, visibilidade inicial | `js/config.js` → `LAYERS` |
-| Relevo (ligar/desligar, exagero) | `js/config.js` → `HILLSHADE` |
+| Relevo/hillshade (ligar/desligar, exagero) | `js/config.js` → `HILLSHADE` |
+| Curvas de nível (intervalos por zoom, cores, opacidade) | `js/config.js` → `CONTOURS` |
 | Clustering | `js/config.js` → `CLUSTER.enabled` |
 | Destaques (boas-vindas) | `js/config.js` → `FEATURED` |
 | Tamanho/raios da rede relacionada | `js/config.js` → `DAM_ICON`, `RELATED` |

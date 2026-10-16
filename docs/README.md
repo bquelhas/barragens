@@ -26,7 +26,8 @@ de dados, frontend, automação e configuração).
 ## Resumo em 30 segundos
 
 - **Frontend**: HTML + CSS + JavaScript vanilla (módulos ES), **MapLibre GL JS**
-  via CDN, mapa base **OpenFreeMap**. Sem framework, sem passo de build.
+  e **maplibre-contour** via CDN, mapa base **OpenFreeMap**, curvas de nível
+  geradas no browser. Sem framework, sem passo de build.
 - **Dados**: ficheiros estáticos em `data/` (`*.geojson` + `manifest.json` +
   `notion.json`), gerados por um pipeline em **Python**.
 - **Pipeline**: extrai do **OSM** (Overpass API **ou** extracts do Geofabrik

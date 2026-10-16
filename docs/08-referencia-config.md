@@ -144,7 +144,8 @@ A configuração está centralizada em dois ficheiros que se **espelham**:
 | --- | --- |
 | `DAM_ICON` | `size` (px), `minSize`, `maxSize` — dimensionamento do ícone |
 | `RELATED` | `line` (300 m), `sub` (400 m), `dim` (0.16) — destaque da rede |
-| `HILLSHADE` | `enabled`, `tiles`, `encoding`, `tileSize`, `maxzoom`, `exaggeration`, `attribution` |
+| `HILLSHADE` | `enabled` (`false`), `tiles`, `encoding`, `tileSize`, `maxzoom`, `exaggeration`, `attribution` |
+| `CONTOURS` | `enabled`, `encoding`, `maxzoom`, `sourceMaxzoom`, `worker`, `cacheSize`, `timeoutMs`, `thresholds` (intervalos por zoom, em metros), `colors` (claro/escuro), `opacity`, `minElevation`, `labelMinzoom`, `labelFont` |
 | `FEATURED` | Destaques do ecrã de boas-vindas (por `name` ou `id`) |
 | `DATA` | `manifest`, `notion` (caminhos) |
 | `CLUSTER` | `enabled` (`false`), `radius`, `maxZoom` |

@@ -66,7 +66,7 @@ flowchart LR
 | --- | --- |
 | Mapa | [MapLibre GL JS](https://maplibre.org) 4.7.1 (CDN: `unpkg.com`) |
 | Mapa base | [OpenFreeMap](https://openfreemap.org) — estilos `positron` (claro) e `dark` |
-| Relevo | Terrain Tiles (AWS/Mapzen, `elevation-tiles-prod`, codificação *terrarium*) |
+| Relevo | Terrain Tiles (AWS/Mapzen, `elevation-tiles-prod`, codificação *terrarium*); curvas de nível geradas no browser com [`maplibre-contour`](https://github.com/onthegomap/maplibre-contour) |
 | Frontend | HTML5 + CSS3 + JavaScript vanilla (módulos ES), **sem build** |
 | Tipografia | *Fraunces* (títulos) + *Inter* (UI), via Google Fonts |
 | Dados | Python 3.10+; `shapely`, `pyproj` (principal), `osmium`/pyosmium (extracts `.pbf`) |
