@@ -6,7 +6,7 @@ import {
   LAYERS, USO_COLORS, USO_ORDER, PALETTE, CLUSTER, DAM_ICON, RELATED, HILLSHADE,
   CONFIANCA_COLORS, CONFIANCA_ORDER,
 } from "./config.js";
-import { fetchJson, distanceM, distanceToGeometryM, pointOf } from "./utils.js";
+import { fetchJson, distanceM, distanceToGeometryM, pointOf, normalize } from "./utils.js";
 
 const state = {
   map: null,
@@ -202,6 +202,7 @@ async function ensureDamIcons() {
 async function loadLayerData(key) {
   const files = state.manifest?.layers?.[key];
   if (!files || files.length === 0) return null;
+  if (state.data[key]) return { type: "FeatureCollection", features: state.data[key] };
 
   const features = [];
   const v = encodeURIComponent(state.manifest?.generated_at || Date.now());
@@ -707,3 +708,35 @@ export function allDams() { return state.data.dams || []; }
 export function allReservoirs() { return state.data.reservoirs || []; }
 export function isLoaded(key) { return state.loaded.has(key); }
 export function selectedDamId() { return state.selectedDam; }
+
+/** Carrega só os dados de uma camada (sem a desenhar no mapa). */
+export function preloadLayerData(key) { return loadLayerData(key).catch(() => null); }
+
+/** Chave de comparação de nomes de barragem (sem acentos/prefixos). */
+function damKey(name) {
+  let t = normalize(name || "");
+  for (const p of ["barragem de ", "barragem da ", "barragem do ", "barragem ",
+    "presa de ", "presa da ", "presa del ", "presa ",
+    "embalse de ", "embalse del ", "embalse "]) {
+    if (t.startsWith(p)) { t = t.slice(p.length); break; }
+  }
+  return t.trim();
+}
+
+/**
+ * Aldeias submersas e bairros ligados a uma barragem.
+ * Liga por `dam_id` (exato); se faltar, tenta pelo nome da barragem-mãe.
+ */
+export function curatedForDam(damId, damName) {
+  const out = [];
+  const key = damKey(damName);
+  for (const layerKey of ["submersos", "bairros"]) {
+    for (const f of state.data[layerKey] || []) {
+      const p = f.properties || {};
+      const byId = damId && p.dam_id && p.dam_id === damId;
+      const byName = key && damKey(p.barragem) === key;
+      if (byId || byName) out.push({ layer: layerKey, ...p });
+    }
+  }
+  return out;
+}

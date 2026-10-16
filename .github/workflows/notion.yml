@@ -1,20 +1,20 @@
-name: Dados Notion (diário)
+name: Dados Notion (manual)
 
-# Atualiza apenas `data/notion.json` (links para as páginas do Notion),
-# independentemente da extração OSM. Corre uma vez por dia (05:37 UTC) e
-# também à mão. Se editares o Notion e quiseres ver já, usa "Run workflow".
+# Atualiza apenas `data/notion.json` (links para as páginas do Notion) e as
+# camadas `submersos`/`bairros` (base Lost Cities - BD).
 #
-# Nota: as capas carregadas NO Notion expiram (~1 h); correr mais vezes não
-# resolve isso — o estável é usar URLs externas para as fotos.
+# Corre SÓ quando é lançado à mão (separador "Actions" -> "Run workflow").
+# Não tem agendamento.
+#
+# Nota: as fotos carregadas NO Notion (Files & Media) expiram (~1 h); correr
+# mais vezes não resolve isso — o estável é usar URLs externas.
 #
 # Segredos necessários (Settings -> Secrets and variables -> Actions):
 #   NOTION_TOKEN         token da integração do Notion
-#   NOTION_DATABASE_ID   id da base de dados de barragens
+#   NOTION_DATABASE_ID   id da base de dados
 # Se não existirem, o script termina sem erro e o site fica sem links.
 
 on:
-  schedule:
-    - cron: "37 5 * * *"
   workflow_dispatch:
 
 concurrency:

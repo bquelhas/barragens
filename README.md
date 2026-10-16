@@ -51,6 +51,7 @@ scripts/geo.py                 Geometria/SIG (multipolígonos, distâncias)
 scripts/fixtures/              Amostra local (usada por `--offline`)
 requirements.txt               Dependências Python
 .github/workflows/             Ações automáticas (dados, notícia, publicação)
+docs/                          Documentação técnica (ver docs/README.md)
 ```
 
 ---
@@ -177,13 +178,16 @@ O objetivo: cada barragem do mapa pode mostrar uma foto e um botão
 ### 6.1. Preparar a base de dados no Notion
 
 1. Cria no Notion uma **base de dados** com uma página por barragem.
-2. Adiciona uma propriedade de texto chamada exatamente **`ID Mapa`**.
+2. Adiciona uma propriedade de texto chamada **`OSM`** (o antigo `ID Mapa`
+   continua a ser aceite).
 3. (Opcional) Adiciona as propriedades **`Resumo`** (texto) e **`Foto`** (URL
    externa, ver nota em baixo).
-4. Copia o `ID Mapa` a partir do mapa: clica numa barragem e usa o botão
-   **"Copiar ID"**; cola esse valor na propriedade `ID Mapa` da página.
+4. Copia o `ID OSM` a partir do mapa: clica numa barragem e usa o botão
+   **"Copiar ID"**; cola esse valor na propriedade `OSM` da página.
    Também podes colar o link completo do OpenStreetMap
    (`https://www.openstreetmap.org/way/123456`) — o script normaliza sozinho.
+   Podes colar o id da **barragem** ou o da **albufeira**: uma albufeira é
+   traduzida automaticamente para a barragem associada.
 
 > **Nota sobre fotos:** capas/imagens carregadas para o Notion geram ligações
 > que **expiram ao fim de ~1 hora**. Por isso, para fotos estáveis, usa uma
@@ -204,9 +208,9 @@ O objetivo: cada barragem do mapa pode mostrar uma foto e um botão
 2. Cria duas entradas:
    * `NOTION_TOKEN` → o token da integração.
    * `NOTION_DATABASE_ID` → o ID da base de dados.
-3. Pronto. O workflow **"Dados Notion (diário)"** vai gerar
-   `data/notion.json` automaticamente. Podes também lançá-lo à mão no
-   separador **Actions** (*Run workflow*).
+3. Pronto. O workflow **"Dados Notion (manual)"** gera `data/notion.json` (e
+   as camadas `submersos`/`bairros`) quando o lançares no separador **Actions**
+   (*Run workflow*). Não corre sozinho.
 
 Se não configurares os segredos, **o site continua a funcionar** — apenas sem
 links para o Notion.
@@ -225,8 +229,9 @@ python scripts/fetch_notion.py --dry-run  # só valida, sem escrever
 | Workflow | Quando corre | O que faz |
 | --- | --- | --- |
 | **Dados OSM (semanal)** | Segundas, 04:17 UTC (+ manual) | Regenera `data/*.geojson` a partir dos extracts do **Geofabrik (.pbf)** e faz commit, país a país |
-| **Dados Notion (diário)** | Diariamente, 05:37 UTC (+ manual) | Atualiza `data/notion.json` e as camadas `submersos`/`bairros` (base Lost Cities - BD) |
+| **Dados Notion (manual)** | Só quando lançado à mão | Atualiza `data/notion.json` e as camadas `submersos`/`bairros` (base Lost Cities - BD) |
 | **Publicar no GitHub Pages** | A cada `push` em `main` (+ manual) | Publica o site |
+| **Pré-preencher OSM (manual)** | Só quando lançado à mão | Preenche a coluna `OSM` das páginas de barragem (ensaio por omissão) |
 
 Podes mudar as frequências editando as linhas `cron:` nos ficheiros em
 `.github/workflows/`.
@@ -349,6 +354,13 @@ A camada de **povoados submersos** junta também uma lista **curada**
 * Melhorar a associação espacial (usar também o nome do rio).
 * Adicionar a camada de bairros barragistas (fase 2).
 * Opcional: estatísticas (nº de barragens por país/uso) e exportação CSV.
+
+## 12. Documentação técnica
+
+Para quem mexe no código, há um conjunto de documentos técnicos em
+[`docs/`](docs/README.md): arquitetura, pipeline de dados, modelo de dados,
+frontend, automação (GitHub Actions), integração Notion, desenvolvimento e
+referência de configuração.
 
 ---
 

@@ -45,6 +45,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import config  # noqa: E402
+import notion_ids  # noqa: E402
 
 API_QUERY = "https://api.notion.com/v1/databases/{db}/query"
 NOTION_VERSION = "2022-06-28"
@@ -81,11 +82,12 @@ P_TIPO_OBJ = "Tipo_objeto"
 P_ARQUIVOS = "Arquivos"
 P_FOTOS = "Fotografias"
 P_RELATED = "Related Lost Cities - BD"
+P_OSM = "OSM"   # id do OSM da barragem-mãe (mesma coluna da base única)
 
 # Chaves aceites no parser do export (.md).
 EXPORT_KEYS = [
     P_ARQUIVOS, P_CAMADAS, P_COORD, P_CONCLUSAO, P_INICIAL, P_FOTOS,
-    P_LOCALIZACAO, P_NOTAS_CR, P_NOTAS_IHP, P_PROMOTOR, P_RELATED,
+    P_LOCALIZACAO, P_NOTAS_CR, P_NOTAS_IHP, P_PROMOTOR, P_RELATED, P_OSM,
     P_RIO, P_RUINAS, P_TIPO, P_TIPO_OBJ,
 ]
 
@@ -200,6 +202,8 @@ def record_from_page(page: dict) -> dict:
         "arquivos": prop_list(props.get(P_ARQUIVOS)),
         "fotografias": prop_text(props.get(P_FOTOS)),
         "related_ids": prop_relation_ids(props.get(P_RELATED)),
+        "related_osm": [],
+        "osm": prop_text(props.get(P_OSM)),
         "related_titles": [],
     }
 
@@ -240,12 +244,14 @@ def load_from_api() -> list[dict]:
     if not token or not database_id:
         return []
     pages = query_database(token, database_id)
-    # índice id -> título (para resolver relações)
+    # índices id -> título / id -> OSM (para resolver relações)
     id_to_title = {p["id"]: prop_text(p.get("properties", {}).get(P_TITLE)) for p in pages}
+    id_to_osm = {p["id"]: prop_text(p.get("properties", {}).get(P_OSM)) for p in pages}
     records = []
     for p in pages:
         rec = record_from_page(p)
         rec["related_titles"] = [id_to_title.get(i, "") for i in rec["related_ids"]]
+        rec["related_osm"] = [id_to_osm.get(i, "") for i in rec["related_ids"]]
         records.append(rec)
     log(f"[notion] {len(records)} registos lidos via API.")
     return records
@@ -321,6 +327,8 @@ def load_from_export(dirpath: str) -> list[dict]:
             "arquivos": [x.strip() for x in joined.get(P_ARQUIVOS, "").split(",") if x.strip()],
             "fotografias": joined.get(P_FOTOS, ""),
             "related_ids": [],
+            "related_osm": [],
+            "osm": joined.get(P_OSM, ""),
             "related_titles": _related_titles_from_text(joined.get(P_RELATED, "")),
         })
     log(f"[export] {len(records)} registos lidos de {root}.")
@@ -411,6 +419,21 @@ def parent_barragem(rec: dict, tipo_by_title: dict) -> str:
     return ""
 
 
+def resolve_parent_dam_id(rec: dict, by_name: dict, resolver: "notion_ids.DamResolver") -> str | None:
+    """`dam_id` da barragem-mãe, a partir do id OSM (da relação ou pelo nome)."""
+    for raw in rec.get("related_osm", []) or []:
+        dam_id, _ = resolver.resolve(raw)
+        if dam_id:
+            return dam_id
+    for title in rec.get("related_titles", []) or []:
+        brec = by_name.get(title.strip().lower())
+        if brec:
+            dam_id, _ = resolver.resolve(brec.get("osm"))
+            if dam_id:
+                return dam_id
+    return None
+
+
 def geocode_precision(geo: dict | None) -> str:
     """Classifica a confiança do resultado do geocoder pelo tipo devolvido."""
     if not geo:
@@ -424,7 +447,8 @@ def geocode_precision(geo: dict | None) -> str:
 
 
 def build_feature(rec: dict, geo: dict | None, barragem: str,
-                  anchored: bool = False, prec: str = "boa") -> dict:
+                  anchored: bool = False, prec: str = "boa",
+                  dam_id: str | None = None) -> dict:
     name = rec["name"]
     confianca = "confirmado" if (rec.get("arquivos") or rec.get("notas_cr")) else "provavel"
     local = rec["coordenadas"] or "sem campo Coordenadas"
@@ -445,6 +469,7 @@ def build_feature(rec: dict, geo: dict | None, barragem: str,
         "id": slug(name),
         "name": name,
         "barragem": barragem,
+        "dam_id": dam_id,   # liga o ponto à ficha da barragem no mapa
         "rio": rec.get("rio", ""),
         "local": rec.get("coordenadas", ""),
         "pais": "PT",
@@ -522,6 +547,9 @@ def emit(records: list[dict], cache: dict, allow_network: bool, dry_run: bool) -
 
     # Barragem-mãe de cada povoação/bairro (via relação).
     parents = {r["name"]: parent_barragem(r, tipo_by_title) for r, _ in classified}
+    resolver = notion_ids.DamResolver()
+    parent_dam_ids = {r["name"]: resolve_parent_dam_id(r, by_name, resolver)
+                      for r, _ in classified}
 
     # Ancora: geocodifica a barragem-mãe — o seu campo Coordenadas costuma
     # ser fiável (ex.: "Barragem da Aguieira").
@@ -546,7 +574,8 @@ def emit(records: list[dict], cache: dict, allow_network: bool, dry_run: bool) -
         if not geo:
             sem_coords[kind].append(rec["name"])
             continue
-        buckets[kind].append(build_feature(rec, geo, parent, anchored, prec))
+        buckets[kind].append(build_feature(rec, geo, parent, anchored, prec,
+                                           dam_id=parent_dam_ids[rec["name"]]))
 
     if not dry_run:
         save_cache(cache)

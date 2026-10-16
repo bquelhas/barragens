@@ -115,6 +115,9 @@ async function onMapReady(initial) {
     onSelectReservoir: (item) => openReservoir(item),
   });
   layers.init({ map, manifest, notion });
+  // Pré-carrega (só dados) as camadas curadas, para a ficha poder listá-las.
+  layers.preloadLayerData("submersos");
+  layers.preloadLayerData("bairros");
 
   const defaults = LAYERS.filter((l) => l.default).map((l) => l.key);
   for (const key of defaults) await layers.ensureLayer(key);
@@ -315,6 +318,7 @@ function wireSheetDrag() {
 function openDam(feature) {
   const p = feature.properties;
   panel.showDetail({ type: "Feature", properties: p, geometry: feature.geometry || { coordinates: [0, 0] } });
+  panel.setCurated(layers.curatedForDam(p.dam_id, p.name || p.name_pt || p.name_es));
   layers.selectDam(p.dam_id, p.reservoir_id);
   discover.markSelected(p.dam_id);
   layers.highlightRelated(feature).then((rel) => panel.setRelated(rel)).catch((err) => console.warn("Rede relacionada:", err));
@@ -327,6 +331,8 @@ async function openDamById(damId, coords) {
   const dam = layers.getDam(damId);
   if (dam) {
     panel.showDetail(dam);
+    panel.setCurated(layers.curatedForDam(
+      damId, dam.properties.name || dam.properties.name_pt || dam.properties.name_es));
     layers.selectDam(damId, dam.properties.reservoir_id);
     discover.markSelected(damId);
     layers.highlightRelated(dam).then((rel) => panel.setRelated(rel)).catch((err) => console.warn("Rede relacionada:", err));

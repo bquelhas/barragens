@@ -214,10 +214,11 @@ export function showDetail(dam) {
       ${p.reservoir_name ? `<p class="small muted">Albufeira: ${escapeHtml(p.reservoir_name)}</p>` : ""}
       ${notionBtn}
       <div id="detail-related" class="related-box"><span class="muted small">A procurar rede elétrica relacionada…</span></div>
+      <div id="detail-curated" class="curated-box" hidden></div>
 
       <div class="contrib">
         <h3>Contribuir · ligar ao Notion</h3>
-        <p class="small muted">Cola este ID no campo <strong>ID Mapa</strong> da página no Notion.</p>
+        <p class="small muted">Cola este ID no campo <strong>OSM</strong> da página no Notion.</p>
         <code id="dam-id">${escapeHtml(p.dam_id || "")}</code>
         <button class="btn block" id="copy-id" type="button">Copiar ID</button>
       </div>
@@ -254,7 +255,7 @@ function heroSvg(color) {
 
 function techText(p) {
   const lines = [
-    `ID Mapa: ${p.dam_id || "—"}`,
+    `ID OSM: ${p.dam_id || "—"}`,
     `OSM: ${p.osm_type}/${p.osm_id}`,
     `Operador: ${p.operator || "—"}`,
     `Altitude: ${p.ele != null ? p.ele + " m" : "—"}`,
@@ -278,6 +279,29 @@ export function setRelated(rel) {
   if (rel.nSubs) parts.push(`<div class="small"><strong>Subestações:</strong> ${rel.nSubs}</div>`);
   if (rel.nLines) parts.push(`<div class="small"><strong>Linhas elétricas:</strong> ${rel.nLines}</div>`);
   box.innerHTML = `<div class="related-title">⚡ Rede relacionada (a âmbar no mapa)</div>${parts.join("")}`;
+}
+
+export function setCurated(items) {
+  const box = document.getElementById("detail-curated");
+  if (!box) return;
+  if (!items || !items.length) { box.hidden = true; box.innerHTML = ""; return; }
+  const rows = items.map((it) => {
+    const conf = it.confianca || "";
+    const color = CONFIANCA_COLORS[conf] || "#8b9096";
+    const label = CONFIANCA_LABELS[conf] || "";
+    const kind = it.layer === "bairros" ? "Bairro novo" : "Povoado submerso";
+    const link = it.notion_url
+      ? ` <a class="icon-link" href="${escapeHtml(it.notion_url)}" target="_blank" rel="noopener">Notion</a>` : "";
+    const ressalva = it.ressalva ? `<div class="small muted">${escapeHtml(it.ressalva)}</div>` : "";
+    return `<div class="curated-item">
+      <span class="dot" style="background:${color}"></span>
+      <strong>${escapeHtml(it.name || "—")}</strong>
+      <span class="small muted">· ${escapeHtml(kind)}${label ? ` · ${escapeHtml(label)}` : ""}</span>${link}
+      ${ressalva}
+    </div>`;
+  });
+  box.innerHTML = `<div class="related-title">🏚 Aldeias submersas e bairros ligados</div>${rows.join("")}`;
+  box.hidden = false;
 }
 
 function copyId(text, btn) {

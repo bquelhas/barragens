@@ -1,16 +1,25 @@
 """
 Liga as barragens às páginas do Notion.
 
-Lê uma base de dados pública do Notion através da API oficial e gera
-`data/notion.json` no formato:
+Lê a **base única** (com `Tipo_objeto` = barragem / Aldeia Submersa / Bairro)
+através da API oficial e gera `data/notion.json` no formato:
 
     { "way/123456": { "url": "...", "titulo": "...",
                       "foto_capa": "...", "resumo": "..." }, ... }
 
+Só trata os registos com `Tipo_objeto` = "barragem" (as aldeias submersas e os
+bairros são tratados por `fetch_lost_cities.py`). O id lido da coluna **`OSM`**
+(ou, em alternativa, **`ID Mapa`**) é normalizado e **resolvido para o `dam_id`**
+da barragem: aceita o id de uma barragem (`waterway=dam`) **ou de uma albufeira**
+(que é traduzida para a barragem associada).
+
+Se dois registos apontarem para a mesma barragem, ganha o mais recente
+(`last_edited_time`) e é registado um aviso.
+
 Variáveis de ambiente:
-    NOTION_TOKEN         token da integração (GitHub Secret)
-    NOTION_DATABASE_ID   id da base de dados de barragens
-    NOTION_PUBLIC_DOMAIN domínio público do Notion (opcional, p/ URL pública)
+    NOTION_TOKEN          token da integração (GitHub Secret)
+    NOTION_DATABASE_ID    id da base de dados
+    NOTION_PUBLIC_DOMAIN  domínio público do Notion (opcional)
 
 Se o token não estiver definido, o script termina sem erro: o site funciona
 na mesma, apenas sem links para o Notion.
@@ -25,7 +34,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import sys
 import urllib.error
 import urllib.request
@@ -35,53 +43,61 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import config  # noqa: E402
+import notion_ids  # noqa: E402
 
 API_URL = "https://api.notion.com/v1/databases/{db}/query"
 NOTION_VERSION = "2022-06-28"
 
-# Aceita "way/123", "way 123", URL do OSM completa, e "relation/1".
-ID_RE = re.compile(r"(node|way|relation)\s*[/ ]\s*(\d+)", re.IGNORECASE)
-OSM_URL_RE = re.compile(
-    r"openstreetmap\.org/(node|way|relation)/(\d+)", re.IGNORECASE)
+# Propriedades na base do Notion.
+TIPO_PROPERTY = "Tipo_objeto"
+OSM_PROPERTY = "OSM"
 
 
 def log(msg: str):
     print(msg, flush=True)
 
 
-def normalize_dam_id(raw: str | None) -> str | None:
-    """
-    Normaliza um valor colado pelo utilizador para o formato `tipo/id`.
-
-    Aceita `way/123456`, `way 123456` e
-    `https://www.openstreetmap.org/way/123456`.
-    """
-    if not raw:
-        return None
-    text = raw.strip()
-    m = OSM_URL_RE.search(text)
-    if not m:
-        m = ID_RE.search(text)
-    if not m:
-        return None
-    return f"{m.group(1).lower()}/{m.group(2)}"
-
-
-def rich_text(prop: dict | None) -> str:
-    """Extrai o texto simples de uma propriedade rich_text/title."""
+def text_of(prop: dict | None) -> str:
+    """Texto simples de uma propriedade Notion (rich_text/title/select/...)."""
     if not prop:
         return ""
-    parts = prop.get("rich_text") or prop.get("title") or []
-    return "".join(p.get("plain_text", "") for p in parts).strip()
+    kind = prop.get("type")
+    if kind in ("rich_text", "title"):
+        return "".join(p.get("plain_text", "") for p in prop.get(kind, [])).strip()
+    if kind in ("select", "status"):
+        val = prop.get(kind) or {}
+        return (val.get("name") or "").strip()
+    if kind == "url":
+        return (prop.get("url") or "").strip()
+    return ""
+
+
+def page_tipo(props: dict) -> str:
+    """Valor de `Tipo_objeto` (ex.: 'barragem'), ou '' se não existir."""
+    _, prop = notion_ids.find_property(props, TIPO_PROPERTY)
+    return text_of(prop)
+
+
+def page_id_value(props: dict) -> str:
+    """Id do OSM: coluna `OSM` ou, em alternativa, `ID Mapa`."""
+    _, osm = notion_ids.find_property(props, OSM_PROPERTY)
+    if text_of(osm):
+        return text_of(osm)
+    _, alt = notion_ids.find_property(props, config.NOTION_ID_PROPERTY)
+    return text_of(alt)
+
+
+def page_title(props: dict) -> str:
+    for prop in props.values():
+        if prop.get("type") == "title":
+            return text_of(prop)
+    return ""
 
 
 def extract_cover(page: dict) -> str | None:
     """
-    Devolve o URL da capa.
-
-    Aviso: capas carregadas para o Notion geram URLs que expiram (~1h).
-    Nestes casos o site deve preferir capas externas; guardamos na mesma o
-    URL e registamos a limitação no log.
+    URL da capa. Aviso: capas carregadas para o Notion expiram (~1h); para
+    fotos estáveis, usar URLs externas.
     """
     cover = page.get("cover")
     if not cover:
@@ -91,13 +107,32 @@ def extract_cover(page: dict) -> str | None:
     return data.get("url")
 
 
+def files_url(prop: dict | None) -> str | None:
+    """
+    Primeira imagem de uma propriedade **Files & Media** (tipo `files`).
+
+    Aviso: ficheiros carregados para o Notion geram URLs que expiram (~1h);
+    para fotos estáveis, usar URLs externas.
+    """
+    if not prop or prop.get("type") != "files":
+        return None
+    for f in prop.get("files", []):
+        kind = f.get("type")
+        if kind == "external":
+            return (f.get("external") or {}).get("url")
+        if kind == "file":
+            return (f.get("file") or {}).get("url")
+        if kind == "file_upload":
+            return (f.get("file_upload") or {}).get("url")
+    return None
+
+
 def public_url(page: dict) -> str:
     """URL público da página (usa `public_url` se a página estiver publicada)."""
     if page.get("public_url"):
         return page["public_url"]
     domain = os.environ.get("NOTION_PUBLIC_DOMAIN") or config.NOTION_PUBLIC_DOMAIN
     url = page.get("url", "")
-    # https://www.notion.so/<slug>-<id> -> https://<workspace>.<domain>/...
     if domain and "notion.so" in url:
         return url.replace("www.notion.so", f"www.{domain}")
     return url
@@ -108,7 +143,7 @@ def query_database(token: str, database_id: str) -> list[dict]:
     pages: list[dict] = []
     cursor: str | None = None
     while True:
-        body = {"page_size": 100}
+        body: dict = {"page_size": 100}
         if cursor:
             body["start_cursor"] = cursor
         req = urllib.request.Request(
@@ -130,41 +165,57 @@ def query_database(token: str, database_id: str) -> list[dict]:
     return pages
 
 
-def build_index(pages: list[dict]) -> dict:
-    """Constrói o índice dam_id -> metadados, validando IDs."""
+def build_index(pages: list[dict], resolver: notion_ids.DamResolver) -> dict:
+    """Constrói o índice dam_id -> metadados, filtrando e validando."""
     index: dict[str, dict] = {}
     invalid: list[str] = []
-    duplicates: list[str] = []
+    unresolved: list[str] = []
+    conflicts: list[str] = []
 
     for page in pages:
         props = page.get("properties", {})
-        raw_id = rich_text(props.get(config.NOTION_ID_PROPERTY))
-        dam_id = normalize_dam_id(raw_id)
+
+        # Base única: só interessam os registos de barragem.
+        tipo = page_tipo(props)
+        if tipo and tipo.strip().lower() != "barragem":
+            continue
+
+        raw_id = page_id_value(props)
+        dam_id, motivo = resolver.resolve(raw_id)
         if not dam_id:
-            invalid.append(raw_id or f"<página sem '{config.NOTION_ID_PROPERTY}'>")
-            continue
-        if dam_id in index:
-            duplicates.append(dam_id)
+            if motivo == "sem id":
+                invalid.append(raw_id or f"<página sem '{OSM_PROPERTY}'/'{config.NOTION_ID_PROPERTY}'>")
+            else:
+                unresolved.append(f"{raw_id or page_title(props)} ({motivo})")
             continue
 
-        title = ""
-        for prop in props.values():
-            if prop.get("type") == "title":
-                title = rich_text(prop)
-                break
-
-        index[dam_id] = {
+        _, resumo = notion_ids.find_property(props, config.NOTION_SUMMARY_PROPERTY)
+        _, foto = notion_ids.find_property(props, config.NOTION_COVER_PROPERTY)
+        meta = {
             "url": public_url(page),
-            "titulo": title,
-            "foto_capa": extract_cover(page),
-            "resumo": rich_text(props.get(config.NOTION_SUMMARY_PROPERTY)),
+            "titulo": page_title(props),
+            # Prioridade: propriedade "Foto" (Files & Media) -> capa da página.
+            "foto_capa": files_url(foto) or extract_cover(page),
+            "resumo": text_of(resumo),
             "last_edited": page.get("last_edited_time"),
         }
 
+        prev = index.get(dam_id)
+        if prev is not None:
+            conflicts.append(dam_id)
+            # Ganha o mais recente (last_edited_time ISO ordena bem como texto).
+            if (meta.get("last_edited") or "") <= (prev.get("last_edited") or ""):
+                continue
+        index[dam_id] = meta
+
     if invalid:
-        log(f"[notion] {len(invalid)} página(s) com ID inválido/ausente: {invalid[:20]}")
-    if duplicates:
-        log(f"[notion] {len(duplicates)} ID(s) duplicado(s): {duplicates[:20]}")
+        log(f"[notion] {len(invalid)} registo(s) sem id válido: {invalid[:20]}")
+    if unresolved:
+        log(f"[notion] {len(unresolved)} id(s) não resolvidos nos dados (barragem/albufeira): "
+            f"{unresolved[:20]}")
+    if conflicts:
+        log(f"[notion] {len(set(conflicts))} barragem(ns) com mais do que uma página "
+            f"(ficou a mais recente): {sorted(set(conflicts))[:20]}")
     return index
 
 
@@ -182,14 +233,19 @@ def main():
             "a saltar (o site continua a funcionar sem links).")
         return
 
+    resolver = notion_ids.DamResolver()
+    if not resolver.ready:
+        log("[notion] aviso: não encontrei barragens em data/dams_*.geojson; "
+            "os ids não vão poder ser resolvidos (corre o pipeline de dados primeiro).")
+
     try:
         pages = query_database(token, database_id)
     except urllib.error.HTTPError as exc:
         log(f"[notion] erro HTTP {exc.code}: {exc.read().decode('utf-8', 'replace')[:300]}")
         raise SystemExit(1)
 
-    index = build_index(pages)
-    log(f"[notion] {len(index)} barragens com página Notion.")
+    index = build_index(pages, resolver)
+    log(f"[notion] {len(pages)} páginas lidas; {len(index)} barragens com página.")
 
     if args.dry_run:
         log("[notion] --dry-run: não escreveu ficheiro.")

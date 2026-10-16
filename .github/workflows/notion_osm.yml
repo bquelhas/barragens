@@ -1,0 +1,67 @@
+name: Pré-preencher OSM (manual)
+
+# Corre APENAS quando é lançado à mão: separador "Actions" -> este workflow
+# -> "Run workflow". Não tem agendamento (não corre sozinho).
+#
+# Preenche a coluna "OSM" das páginas de barragem com o id do OpenStreetMap.
+# Por omissão é ENSAIO (não escreve); escolhe apply=true para escrever mesmo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Escrever mesmo? (senão é só ensaio)"
+        type: boolean
+        default: false
+      ensure_property:
+        description: "Criar a coluna OSM se não existir"
+        type: boolean
+        default: true
+      value:
+        description: "Guardar o id (way/…) ou o URL completo do OSM"
+        type: choice
+        options:
+          - id
+          - url
+        default: id
+
+permissions:
+  contents: read
+
+jobs:
+  preencher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pré-preencher a coluna OSM
+        shell: bash
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: |
+          set -e
+          ARGS=(--value "${{ inputs.value }}")
+          if [ "${{ inputs.apply }}" = "true" ]; then ARGS+=(--apply); fi
+          if [ "${{ inputs.ensure_property }}" = "true" ]; then ARGS+=(--ensure-property); fi
+          echo "Modo: ${{ inputs.apply == 'true' && 'ESCRITA' || 'ENSAIO (dry-run)' }}"
+          python scripts/push_notion_osm.py "${ARGS[@]}"
+
+      - name: Mostrar o relatório
+        if: always()
+        shell: bash
+        run: cat exports/notion_osm_propostas.csv || true
+
+      - name: Arquivar o relatório (CSV)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notion-osm-propostas
+          path: exports/notion_osm_propostas.csv
+          if-no-files-found: warn
