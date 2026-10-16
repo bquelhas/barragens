@@ -540,8 +540,12 @@ def write_layer(name: str, features: list[dict]):
 
 
 def _country_of(layer: str, filename: str) -> str | None:
-    """Extrai o país do nome do ficheiro (ex.: dams_pt.geojson -> PT)."""
-    m = re.match(rf"^{re.escape(layer)}_([a-zA-Z]+)\.geojson$", filename)
+    """Extrai o país do nome do ficheiro (ex.: dams_pt.geojson -> PT).
+
+    Exige exatamente duas letras, para não confundir sufixos que não são
+    códigos de país (ex.: `submersos_notion.geojson`).
+    """
+    m = re.match(rf"^{re.escape(layer)}_([a-zA-Z]{{2}})\.geojson$", filename)
     return m.group(1).upper() if m else None
 
 

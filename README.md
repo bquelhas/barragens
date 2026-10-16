@@ -225,7 +225,7 @@ python scripts/fetch_notion.py --dry-run  # só valida, sem escrever
 | Workflow | Quando corre | O que faz |
 | --- | --- | --- |
 | **Dados OSM (semanal)** | Segundas, 04:17 UTC (+ manual) | Regenera `data/*.geojson` a partir dos extracts do **Geofabrik (.pbf)** e faz commit, país a país |
-| **Dados Notion (diário)** | Diariamente, 05:37 UTC (+ manual) | Atualiza `data/notion.json` |
+| **Dados Notion (diário)** | Diariamente, 05:37 UTC (+ manual) | Atualiza `data/notion.json` e as camadas `submersos`/`bairros` (base Lost Cities - BD) |
 | **Publicar no GitHub Pages** | A cada `push` em `main` (+ manual) | Publica o site |
 
 Podes mudar as frequências editando as linhas `cron:` nos ficheiros em
@@ -237,29 +237,41 @@ das barragens anteriores, o script **não substitui** os dados bons (usa
 
 ---
 
-## 8. Fase 2 — bairros barragistas
+## 8. Aldeias submersas e bairros novos (base "Lost Cities - BD")
 
-Já está preparado, mas ainda **não implementado**:
+As camadas **"Povoados submersos"** e **"Bairros novos"** alimentam-se da
+base de investigação **Lost Cities - BD** do Notion, via
+`scripts/fetch_lost_cities.py`:
 
-* Existe `data/bairros.geojson` (vazio) e a camada **"Bairros barragistas"** no
-  painel (desligada por defeito).
-* O esquema previsto para cada polígono é:
+* Lê a base pela **API do Notion** (`NOTION_TOKEN`, `NOTION_DATABASE_ID`) ou,
+  em alternativa, de um **export local** (`--from-export PASTA`).
+* Seleciona os registos `Tipo_objeto` = *Aldeia Submersa* / *Bairro*, associa
+  cada um à sua **barragem-mãe** (campo `Related Lost Cities - BD`) e
+  **geocodifica** o campo `Coordenadas` (Nominatim/OSM, 1 pedido/s, com cache em
+  `scripts/geocode_cache.json`).
+* Quando a geocodificação é fraca, **ancora** o ponto na barragem-mãe e escreve
+  a `ressalva` correspondente (visível na ficha).
+* Gera `data/submersos_notion.geojson` e `data/bairros_notion.geojson` (pontos)
+  e atualiza o `manifest.json`.
 
-  ```json
-  {
-    "id": "bairro-alqueva",
-    "nome": "Bairro dos Operários",
-    "dam_id": "way/123456",
-    "periodo": "1942-1975",
-    "notion_url": "https://...",
-    "descricao": "Texto curto"
-  }
-  ```
+```bash
+python scripts/fetch_lost_cities.py                    # via Notion API
+python scripts/fetch_lost_cities.py --from-export PASTA # export local (.md)
+python scripts/fetch_lost_cities.py --offline          # sem rede
+```
 
-Para desenhar bairros, usa o [geojson.io](https://geojson.io) ou o
-[QGIS](https://qgis.org), exporta **GeoJSON**, coloca as propriedades acima e
-faz commit do ficheiro em `data/bairros.geojson`. (No futuro podem também vir
-do Notion.)
+A camada de **povoados submersos** junta também uma lista **curada**
+(`data/submersos.geojson`, casos de fontes históricas). O campo `confianca`
+(`confirmado` / `provavel` / `por_verificar`) colore os pontos.
+
+> **Privacidade:** o export do Notion (`notion/`) contém notas de investigação e
+> ligações pessoais — está no `.gitignore` e **não** é publicado. Só os GeoJSON
+> derivados (em `data/`) vão para o site.
+
+> **Coordenadas:** o campo `Coordenadas` do Notion é texto (moradas, nomes de
+> barragens, marcos), não lat/lon — por isso é geocodificado e, quando falha,
+> ancorado na barragem. Todas as posições devem ser revistas; o ideal é
+> acrescentar colunas `Latitude`/`Longitude` à base.
 
 ---
 

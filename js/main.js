@@ -188,6 +188,10 @@ function wireMapEvents() {
     map.on("mouseenter", "submersos-point", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "submersos-point", () => (map.getCanvas().style.cursor = ""));
   }
+  if (map.getLayer("bairros-point")) {
+    map.on("mouseenter", "bairros-point", () => (map.getCanvas().style.cursor = "pointer"));
+    map.on("mouseleave", "bairros-point", () => (map.getCanvas().style.cursor = ""));
+  }
 
   // Um único handler de clique. Prioridade: cluster > barragem > albufeira >
   // barragem mais próxima (garante que continua clicável com ícones sobrepostos).
@@ -212,9 +216,10 @@ function wireMapEvents() {
     const poiHits = poiLayers.length ? map.queryRenderedFeatures(e.point, { layers: poiLayers }) : [];
     if (poiHits.length) { openPoi(poiHits[0].properties); return; }
 
-    const subLayers = ["submersos-point", "submersos-label"].filter((id) => map.getLayer(id));
-    const subHits = subLayers.length ? map.queryRenderedFeatures(e.point, { layers: subLayers }) : [];
-    if (subHits.length) { openSubmerged(subHits[0]); return; }
+    const curatedLayers = ["submersos-point", "submersos-label", "bairros-point", "bairros-label"]
+      .filter((id) => map.getLayer(id));
+    const curatedHits = curatedLayers.length ? map.queryRenderedFeatures(e.point, { layers: curatedLayers }) : [];
+    if (curatedHits.length) { openCurated(curatedHits[0]); return; }
 
     const near = nearestDam(e.point, 22);
     if (near) openDam(near);
@@ -363,10 +368,10 @@ function openPoi(props) {
   writeHash();
 }
 
-/** Mostra o cartão de um povoado submerso (com a sua ressalva). */
-function openSubmerged(feature) {
+/** Mostra o cartão de um ponto curado (povoado submerso ou bairro novo). */
+function openCurated(feature) {
   layers.clearSelection();
-  panel.showSubmerged(feature.properties || {}, feature.geometry?.coordinates);
+  panel.showCurated(feature.properties || {}, feature.geometry?.coordinates);
   discover.markSelected(null);
   writeHash();
 }

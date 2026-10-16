@@ -312,14 +312,15 @@ function addGeneric(def, fc) {
       id: `${def.key}-line`, type: "line", source: srcId, minzoom: def.minzoom,
       paint: { "line-color": colorExpr, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1.6, 16, 3.2], "line-opacity": 0.9 },
     });
-  } else if (def.kind === "submerged") {
-    // Povoados submersos (camada curada): a cor do ponto codifica a
-    // confiança da fonte; o rótulo aparece a partir de um certo zoom.
+  } else if (def.kind === "curated") {
+    // Camadas curadas (povoados submersos, bairros novos): pontos cujo rótulo
+    // aparece a partir de um certo zoom. Se a feature tiver `confianca`, a cor
+    // codifica-a; caso contrário usa a cor da camada.
     map.addLayer({
       id: `${def.key}-point`, type: "circle", source: srcId, minzoom: def.minzoom,
       paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 4, 12, 7],
-        "circle-color": confiancaColorExpression(),
+        "circle-color": confiancaColorExpression(color),
         "circle-stroke-color": "#ffffff",
         "circle-stroke-width": 1.2,
         "circle-opacity": 0.92,
@@ -368,10 +369,10 @@ function usoIconExpression() {
   return expr;
 }
 
-function confiancaColorExpression() {
+function confiancaColorExpression(fallback) {
   const expr = ["match", ["get", "confianca"]];
   for (const c of CONFIANCA_ORDER) expr.push(c, CONFIANCA_COLORS[c]);
-  expr.push(CONFIANCA_COLORS.por_verificar);
+  expr.push(fallback || CONFIANCA_COLORS.por_verificar);
   return expr;
 }
 
@@ -490,7 +491,7 @@ const layerIdsByKey = (key) => {
   if (def.kind === "polygon") return [`${key}-fill`, `${key}-outline`];
   if (def.kind === "outline") return [`${key}-fill`, `${key}-line`];
   if (def.kind === "poi") return [`${key}-fill`, `${key}-line`, `${key}-label`];
-  if (def.kind === "submerged") return [`${key}-point`, `${key}-label`];
+  if (def.kind === "curated") return [`${key}-point`, `${key}-label`];
   return [`${key}-point`];
 };
 

@@ -1,0 +1,182 @@
+{
+  "bairro padroes, 5470 montalegre, portugal": {
+    "display_name": "Bairro Padrões, Padrões, Venda Nova e Pondras, Montalegre, Vila Real, Portugal",
+    "lat": 41.6736533,
+    "lon": -7.9809477,
+    "place_rank": 26,
+    "type": "residential"
+  },
+  "barragem da aguieira": {
+    "display_name": "Barragem da Aguieira, Vale da Aguieira, Mortágua, Vale de Remígio, Cortegaça e Almaça, Mortágua, Viseu, Portugal",
+    "lat": 40.3406964,
+    "lon": -8.1972651,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem da bemposta": null,
+  "barragem da bouçã": {
+    "display_name": "Barragem da Bouçã, Graça, Pedrógão Grande, Leiria, Portugal",
+    "lat": 39.8535951,
+    "lon": -8.2188893,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem da caniçada": {
+    "display_name": "Barragem da Caniçada, Pandozes, Parada de Bouro, Vieira do Minho, Braga, Portugal",
+    "lat": 41.6527142,
+    "lon": -8.2311076,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem da pracana": {
+    "display_name": "Barragem da Pracana, Envendos, Mação, Santarém, Portugal",
+    "lat": 39.5652153,
+    "lon": -7.8180981,
+    "place_rank": 20,
+    "type": "hamlet"
+  },
+  "barragem da venda nova": {
+    "display_name": "Barragem da Venda Nova, Ferral, Montalegre, Vila Real, Portugal",
+    "lat": 41.6795519,
+    "lon": -7.9825012,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem de belver": {
+    "display_name": "Barragem de Belver, Rua do Apeadeiro, Ortiga, Mação, Santarém, Portugal",
+    "lat": 39.481979,
+    "lon": -8.0012497,
+    "place_rank": 30,
+    "type": "stop"
+  },
+  "barragem de salamonde": {
+    "display_name": "Barragem de Salamonde, Bairro, Salamonde, Vieira do Minho, Braga, Portugal",
+    "lat": 41.6917375,
+    "lon": -8.0914042,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem do cabril": {
+    "display_name": "Barragem do Cabril, Pedrógão Pequeno, Sertã, Castelo Branco, Portugal",
+    "lat": 39.917382,
+    "lon": -8.131379,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem do fratel": {
+    "display_name": "Barragem de Fratel, Arez e Amieira do Tejo, Nisa, Portalegre, Portugal",
+    "lat": 39.5432846,
+    "lon": -7.802773,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "barragem dos pisões": null,
+  "barragem monte da rocha": null,
+  "barrocal do douro, miranda do douro, portugal": {
+    "display_name": "Barrocal do Douro, Picote, Miranda do Douro, Bragança, Portugal",
+    "lat": 41.3864226,
+    "lon": -6.3533783,
+    "place_rank": 20,
+    "type": "hamlet"
+  },
+  "capela de paradela": {
+    "display_name": "Ruga de la Capiêlha, Ifanes e Paradela, Miranda do Douro, Bragança, Portugal",
+    "lat": 41.579819,
+    "lon": -6.2221322,
+    "place_rank": 26,
+    "type": "unclassified"
+  },
+  "castelo de bode dam": {
+    "display_name": "Barragem de Castelo do Bode, Martinchel, Abrantes, Santarém, Portugal",
+    "lat": 39.5426898,
+    "lon": -8.3189588,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "castelo do bode, tomar, portugal": {
+    "display_name": "Castelo do Bode, São Pedro de Tomar, Tomar, Santarém, 2200-638, Portugal",
+    "lat": 39.5452713,
+    "lon": -8.3219801,
+    "place_rank": 20,
+    "type": "hamlet"
+  },
+  "cemitério de vilar": {
+    "display_name": "Cemitério de Vilar, Vilar e Mosteiró, Vila do Conde, Porto, Portugal",
+    "lat": 41.2884183,
+    "lon": -8.670225,
+    "place_rank": 24,
+    "type": "cemetery"
+  },
+  "concatedral de miranda do douro": {
+    "display_name": "Concatedral de Miranda do Douro, Rue de l Paço, Miranda do Douro, Bragança, 5210-211, Portugal",
+    "lat": 41.4930585,
+    "lon": -6.2733433,
+    "place_rank": 30,
+    "type": "place_of_worship"
+  },
+  "miranda do douro, portugal": {
+    "display_name": "Miranda do Douro, Bragança, Portugal",
+    "lat": 41.497385,
+    "lon": -6.2738187,
+    "place_rank": 14,
+    "type": "administrative"
+  },
+  "ourique, portugal": {
+    "display_name": "Ourique, Beja, Portugal",
+    "lat": 37.651112,
+    "lon": -8.2237262,
+    "place_rank": 14,
+    "type": "administrative"
+  },
+  "pousada do alto rabagão": {
+    "display_name": "Pousada do Alto Rabagão, Rua da Pousada, Pisões, Viade de Baixo e Fervidelas, Montalegre, Vila Real, Portugal",
+    "lat": 41.7415612,
+    "lon": -7.8653057,
+    "place_rank": 30,
+    "type": "hotel"
+  },
+  "ribeira bar": {
+    "display_name": "BAR, 73, Largo da Ramadinha, Baixa do Porto, Conjunto Urbano da Ribeira, Centro Histórico do Porto, Cedofeita, Santo Ildefonso, Sé, Miragaia, São Nicolau e Vitória, Porto, 4000-465, Portugal",
+    "lat": 41.1464123,
+    "lon": -8.6032742,
+    "place_rank": 30,
+    "type": "pub"
+  },
+  "rua da barragem 3, 5470-362 montalegre, portugal": null,
+  "rua do penedo da carvalha, 5470 montalegre, portugal": null,
+  "santa luzia dam": {
+    "display_name": "Barragem de Santa Luzia, Vidual de Baixo, Fajão-Vidual, Pampilhosa da Serra, Coimbra, Portugal",
+    "lat": 40.0894553,
+    "lon": -7.8579895,
+    "place_rank": 20,
+    "type": "dam"
+  },
+  "tabuaço, portugal": {
+    "display_name": "Tabuaço, Viseu, Portugal",
+    "lat": 41.1173591,
+    "lon": -7.5662701,
+    "place_rank": 14,
+    "type": "administrative"
+  },
+  "travanca do mondego, penacova, portugal": {
+    "display_name": "Travanca do Mondego, Penacova, Coimbra, 3360-312, Portugal",
+    "lat": 40.325039,
+    "lon": -8.1869841,
+    "place_rank": 19,
+    "type": "village"
+  },
+  "vidual de baixo, pampilhosa da serra, portugal": {
+    "display_name": "Vidual de Baixo, Fajão-Vidual, Pampilhosa da Serra, Coimbra, Portugal",
+    "lat": 40.0938148,
+    "lon": -7.8597734,
+    "place_rank": 20,
+    "type": "hamlet"
+  },
+  "vilar da veiga, terras de bouro, portugal": {
+    "display_name": "Vilar da Veiga, Terras de Bouro, Braga, Portugal",
+    "lat": 41.70154,
+    "lon": -8.1684698,
+    "place_rank": 16,
+    "type": "administrative"
+  }
+}

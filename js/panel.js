@@ -350,9 +350,9 @@ export function showPoi(p) {
   if (matchMedia("(max-width: 780px)").matches) setSheet("half");
 }
 
-/** Cartão de um povoado submerso — com a ressalva de confiança em destaque. */
-export function showSubmerged(p, coords) {
-  const name = p.name || "Povoado submerso";
+/** Cartão de um ponto curado (povoado submerso ou bairro novo). */
+export function showCurated(p, coords) {
+  const name = p.name || "Lugar";
   const conf = p.confianca || "por_verificar";
   const confColor = CONFIANCA_COLORS[conf] || CONFIANCA_COLORS.por_verificar;
   const confLabel = CONFIANCA_LABELS[conf] || conf;
@@ -362,16 +362,24 @@ export function showSubmerged(p, coords) {
   addFact("Barragem", p.barragem);
   addFact("Rio", p.rio);
   addFact("Concelho", p.concelho);
+  addFact("Local (Notion)", p.local);
+  addFact("Tipo", p.tipo);
   addFact("País", p.pais);
-  addFact("Ano de enchimento", p.ano);
+  addFact("Ano", p.ano);
 
   const coordsTxt = Array.isArray(coords) ? `${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}` : null;
   const aviso = p.ressalva
     ? `<div class="aviso"><div class="aviso-title">⚠ Ressalva</div><p class="small">${escapeHtml(p.ressalva)}</p></div>` : "";
   const fonte = p.fonte ? `<p class="small muted">Fonte: ${escapeHtml(p.fonte)}</p>` : "";
+  const geo = p.geocode ? `<p class="small muted">Localização geocodificada: ${escapeHtml(p.geocode)}</p>` : "";
+  const notion = p.notion_url
+    ? `<a class="btn notion block" href="${escapeHtml(p.notion_url)}" target="_blank" rel="noopener">Ver no Notion</a>` : "";
+
+  const hero = `<div class="ficha-hero"><div class="hero-fallback">${heroSvg(confColor)}</div>${
+    p.notion_foto ? `<img src="${escapeHtml(p.notion_foto)}" alt="" loading="lazy" onerror="this.remove()" />` : ""}</div>`;
 
   dom.detailBody.innerHTML = `
-    <div class="ficha-hero"><div class="hero-fallback">${heroSvg(confColor)}</div></div>
+    ${hero}
     <div class="ficha-body">
       <h2 class="ficha-title">${escapeHtml(name)}</h2>
       <div class="chips">
@@ -381,6 +389,8 @@ export function showSubmerged(p, coords) {
       ${facts.length ? `<div class="facts">${facts.join("")}</div>` : ""}
       ${aviso}
       ${fonte}
+      ${geo}
+      ${notion}
       ${coordsTxt ? `<div class="ficha-footer"><span class="small muted">Coordenadas (aproximadas): ${escapeHtml(coordsTxt)}</span></div>` : ""}
     </div>`;
   dom.detail.hidden = false;

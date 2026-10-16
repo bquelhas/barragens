@@ -88,8 +88,8 @@ export const LAYERS = [
   { key: "power_lines", label: "Linhas elétricas", kind: "line", minzoom: 8, default: false, color: "#c8892b", legendSwatch: "line" },
   { key: "conduits", label: "Condutas e canais", kind: "line", minzoom: 9, default: false, color: "#4f9aa8", legendSwatch: "line" },
   { key: "pois", label: "Pontos de interesse", kind: "poi", minzoom: 11, default: true, color: "#8a5a44", legendSwatch: "polygon" },
-  { key: "submersos", label: "Povoados submersos", kind: "submerged", minzoom: 6, default: true, color: CONFIANCA_COLORS.confirmado, legendSwatch: "circle" },
-  { key: "bairros", label: "Bairros barragistas", kind: "polygon", minzoom: 7, default: false, color: "#b07aa1", legendSwatch: "polygon", future: true },
+  { key: "submersos", label: "Povoados submersos", kind: "curated", minzoom: 6, default: true, color: CONFIANCA_COLORS.confirmado, legendSwatch: "circle" },
+  { key: "bairros", label: "Bairros novos", kind: "curated", minzoom: 7, default: false, color: "#b07aa1", legendSwatch: "circle" },
 ];
 
 // --- Ícone das barragens (Parte C) -----------------------------------

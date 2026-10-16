@@ -15,3 +15,6 @@ Thumbs.db
 # Capturas temporárias
 _shot.png
 _*.png
+
+# Export do Notion (dados de investigação — NÃO publicar)
+notion/

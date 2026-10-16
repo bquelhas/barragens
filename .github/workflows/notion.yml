@@ -41,15 +41,19 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        run: python scripts/fetch_notion.py
+        run: |
+          python scripts/fetch_notion.py
+          python scripts/fetch_lost_cities.py
 
-      - name: Commit e push do notion.json
+      - name: Commit e push dos dados do Notion
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/notion.json
+          git add data/notion.json data/manifest.json \
+                  data/submersos_notion.geojson data/bairros_notion.geojson \
+                  scripts/geocode_cache.json
           if git diff --cached --quiet; then
-            echo "Sem alterações no notion.json."
+            echo "Sem alterações nos dados do Notion."
           else
             git commit -m "dados: atualização Notion $(date -u +%Y-%m-%dT%H:%MZ)"
             git pull --rebase --autostash origin main
