@@ -163,15 +163,20 @@ class Extractor(osmium.SimpleHandler):
         # de fora (era o caso de várias barragens grandes).
         from_way = a.from_way() if hasattr(a, "from_way") else False
 
+        # O pyosmium identifica as áreas com um id codificado: `2 * id` para
+        # malhas fechadas e `2 * id + 1` para relações. Deslocar um bit
+        # devolve o id real do OSM (o que aparece em openstreetmap.org).
+        osm_id = a.id >> 1
+
         if "reservoirs" in self.layers and matches("reservoirs", a.tags):
             geom = _rings_to_polygon(a)
             osm_type = "way" if from_way else "relation"
-            self._add("reservoirs", osm_type, a.id, a.tags, geom)
+            self._add("reservoirs", osm_type, osm_id, a.tags, geom)
 
         if not from_way:
             for layer in ("dams", "weirs"):
                 if layer in self.layers and matches(layer, a.tags):
-                    self._add(layer, "relation", a.id, a.tags, _rings_to_polygon(a))
+                    self._add(layer, "relation", osm_id, a.tags, _rings_to_polygon(a))
 
 
 # ---------------------------------------------------------------------------

@@ -281,6 +281,13 @@ async function doEnsureLayer(key) {
   if (key === "dams") { await ensureDamIcons(); addDams(fc); }
   else addGeneric(def, fc);
 
+  // O MapLibre recusa camadas com estilo inválido **sem** lançar exceção (só
+  // emite um aviso), o que deixaria a camada em falta de forma silenciosa.
+  const faltam = expectedLayerIds(key).filter((id) => !map.getLayer(id));
+  if (faltam.length) {
+    console.error(`Camada "${key}" incompleta: faltam ${faltam.join(", ")}. Ver os avisos do MapLibre.`);
+  }
+
   if (key === "reservoirs") {
     const hl = map.getSource("src-res-highlight");
     if (hl) hl.setData(fc);
@@ -441,8 +448,12 @@ function addDams(fc) {
     filter: pointOnly,
     layout: {
       "icon-image": usoIconExpression(),
-      "icon-size": ["*", ["coalesce", ["get", "dsize"], 0.7],
-                    ["interpolate", ["linear"], ["zoom"], 5, 0.6, 12, 1, 16, 1.08]],
+      // O `zoom` só pode aparecer no topo de um `interpolate`/`step`; por isso
+      // o tamanho por barragem (`dsize`) entra nos valores de saída.
+      "icon-size": ["interpolate", ["linear"], ["zoom"],
+                    5, ["*", ["coalesce", ["get", "dsize"], 0.7], 0.6],
+                    12, ["*", ["coalesce", ["get", "dsize"], 0.7], 1],
+                    16, ["*", ["coalesce", ["get", "dsize"], 0.7], 1.08]],
       "icon-allow-overlap": false,
       "icon-ignore-placement": false,
     },
@@ -495,6 +506,14 @@ const layerIdsByKey = (key) => {
   if (def.kind === "curated") return [`${key}-point`, `${key}-label`];
   return [`${key}-point`];
 };
+
+/** Ids de camada que a chave deve criar (para validar que foi mesmo criada). */
+function expectedLayerIds(key) {
+  if (key !== "dams") return layerIdsByKey(key);
+  const ids = ["dams-selected", "dams-hover", "dams-points", "dams-notion"];
+  if (CLUSTER.enabled) ids.push("dams-clusters", "dams-cluster-count");
+  return ids;
+}
 
 export function setVisibility(key, visible, force = false) {
   state.visible[key] = visible;

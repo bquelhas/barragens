@@ -61,6 +61,28 @@ def _iter_features(layer: str):
             continue
 
 
+def _alt_area_ids(osm_id: str):
+    """Ids alternativos de área do pyosmium (2n / 2n+1), nos dois sentidos.
+
+    Extrações anteriores a 2026-10-16 guardavam o id codificado em vez do id
+    real do OSM. Geramos as duas hipóteses e só aceitamos a que existir nos
+    dados, para valores antigos e novos continuarem a ligar à mesma barragem.
+    Nós nunca foram codificados, por isso não têm alternativas.
+    """
+    if "/" not in osm_id:
+        return ()
+    kind, _, num = osm_id.partition("/")
+    try:
+        i = int(num)
+    except ValueError:
+        return ()
+    if kind == "way":
+        return (f"way/{i // 2}", f"way/{2 * i}")
+    if kind == "relation":
+        return (f"relation/{(i - 1) // 2}", f"relation/{2 * i + 1}")
+    return ()
+
+
 class DamResolver:
     """Traduz ids do OSM (barragem ou albufeira) para o `dam_id` da barragem."""
 
@@ -89,9 +111,17 @@ class DamResolver:
         osm_id = normalize_osm_id(raw)
         if not osm_id:
             return None, "sem id"
+        for candidate, nota in ((osm_id, ""), *((a, "id antigo→") for a in _alt_area_ids(osm_id))):
+            found = self._lookup(candidate)
+            if found is not None:
+                dam_id, motivo = found
+                return dam_id, nota + motivo
+        return None, "id não encontrado nos dados"
+
+    def _lookup(self, osm_id: str) -> tuple[str | None, str] | None:
         if osm_id in self.dams:
             return osm_id, "barragem"
         if osm_id in self.res_to_dam:
             dam = self.res_to_dam[osm_id]
             return (dam, "albufeira→barragem") if dam else (None, "albufeira sem barragem associada")
-        return None, "id não encontrado nos dados"
+        return None
