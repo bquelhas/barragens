@@ -190,7 +190,9 @@ def build_index(pages: list[dict], resolver: notion_ids.DamResolver) -> dict:
             continue
 
         _, resumo = notion_ids.find_property(props, config.NOTION_SUMMARY_PROPERTY)
-        _, foto = notion_ids.find_property(props, config.NOTION_COVER_PROPERTY)
+        # A foto pode estar em "Foto", "Fotos" ou "Fotografias" (Files & Media).
+        _, foto = notion_ids.find_property(
+            props, config.NOTION_COVER_PROPERTY, "Fotos", "Fotografias")
         meta = {
             "url": public_url(page),
             "titulo": page_title(props),

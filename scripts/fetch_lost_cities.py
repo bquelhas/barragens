@@ -195,7 +195,7 @@ def record_from_page(page: dict) -> dict:
         "name": prop_text(_prop(props, P_TITLE)) or "(sem título)",
         "tipo_objeto": prop_text(_prop(props, P_TIPO_OBJ)),
         "camadas": prop_list(_prop(props, P_CAMADAS)),
-        "coordenadas": prop_text(_prop(props, P_COORD)),
+        "coordenadas": prop_text(_prop(props, P_COORD)) or prop_text(_prop(props, P_LOCALIZACAO)),
         "localizacao": prop_text(_prop(props, P_LOCALIZACAO)),
         "rio": prop_text(_prop(props, P_RIO)),
         "tipo": prop_text(_prop(props, P_TIPO)),
@@ -263,7 +263,9 @@ def load_from_api() -> list[dict]:
         records.append(rec)
     log(f"[notion] {len(records)} registos lidos via API.")
     com_coord = sum(1 for r in records if r.get("coordenadas"))
-    log(f"[notion] {com_coord} de {len(records)} registos com «{P_COORD}» preenchido.")
+    com_loc = sum(1 for r in records if r.get("localizacao"))
+    log(f"[notion] com «{P_COORD}»/«{P_LOCALIZACAO}»: {com_coord} | "
+        f"com «{P_LOCALIZACAO}»: {com_loc} (de {len(records)}).")
     return records
 
 
