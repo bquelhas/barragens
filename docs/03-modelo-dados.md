@@ -156,12 +156,25 @@ O frontend junta estes campos aos pontos da camada `dams` (`notion_url`,
 | --- | --- | --- |
 | `dam_id` | `tipo/id` (`way/123`, `node/9`, `relation/5`) | Chave pública que liga o mapa ao Notion |
 | `reservoir_id` | `tipo/id` | Ligação barragem ↔ albufeira |
-| `osm_id` | inteiro | Id OSM bruto |
+| `osm_id` | inteiro | Id **real** do OSM (o que aparece em `openstreetmap.org`) |
 | `fid` | inteiro (0…n-1) | **Só em memória** — id numérico exigido pelo MapLibre (clustering/`feature-state`) |
 
 Regras de normalização do ID no Notion: aceita `way/123`, `way 123` e URLs
 completas `https://www.openstreetmap.org/way/123` (normaliza para
 `way/123`).
+
+### Ids vindos de áreas (armadilha do `pyosmium`)
+
+O `pyosmium` identifica as **áreas** com um id codificado: `2 × id` para malhas
+fechadas (`way`) e `2 × id + 1` para relações. A extração descodifica-o
+(`a.id >> 1`) antes de guardar, para que `osm_id`/`dam_id` sejam o id real do
+OSM. Sem esta descodificação, as albufeiras (todas) e as barragens mapeadas
+como relação tinham ids que **não existem** em `openstreetmap.org` — o link
+«OSM» da ficha dava 404 e um id colado do site não encontrava a barragem.
+
+Os valores escritos na coluna `OSM` do Notion antes de 2026-10-16 podem ter a
+forma antiga (codificada). O resolvedor aceita as duas formas — ver
+`06-notion.md`.
 
 ## 5. Tamanhos e orçamento
 

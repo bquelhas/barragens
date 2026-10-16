@@ -34,6 +34,9 @@ albufeira** — uma albufeira é traduzida para a barragem associada.
   (`way 123`, `way/123` ou URL → `way/123`), **resolve** para o `dam_id`
   (barragem diretamente; albufeira → barragem associada) e obtém o título, a
   capa e o `Resumo`.
+- Aceita também o **id antigo das áreas** (`2n` / `2n+1`) nas albufeiras e
+  barragens-relação, para os valores preenchidos antes de 2026-10-16
+  continuarem a ligar à barragem certa (ver `03-modelo-dados.md`).
 - `public_url` converte o URL interno em público (`public_url`, ou substitui
   `www.notion.so` por `www.<NOTION_PUBLIC_DOMAIN>`).
 - **Regista** no log ids inválidos, ids não encontrados nos dados e

@@ -102,6 +102,9 @@ Uma barragem pode aparecer como várias features OSM (linha + área + nó).
   **ponto representativo** (`representative_point`, garantidamente dentro).
 - `dam_id` = `"{osm_type}/{osm_id}"` da feature primária.
 - `members` lista todos os `tipo/id` agrupados.
+- O `osm_id` das features vindas de `area()` é descodificado (`a.id >> 1`),
+  porque o `pyosmium` codifica as áreas como `2n` (malha fechada) e `2n+1`
+  (relação). Guardamos sempre o id real do OSM.
 
 A normalização de nome remove acentos e prefixos comuns
 ("barragem de/da/do", "presa de/del", "embalse de/del").
