@@ -92,6 +92,36 @@ export const LAYERS = [
   { key: "bairros", label: "Bairros novos", kind: "curated", minzoom: 7, default: false, color: "#b07aa1", legendSwatch: "circle" },
 ];
 
+// --- Barragens de fronteira duplicadas (PT/ES) -----------------------
+// As barragens, contornos, albufeiras e centrais de fronteira aparecem nos dois
+// ficheiros (`*_pt` e `*_es`), porque cada corrida Overpass carimba o seu país no
+// mesmo objecto OSM. O mapa remove as cópias (`js/layers.js`) e mantém, para cada
+// `dam_id`, o país indicado aqui. O país foi determinado pela localização da
+// **central (casa de máquinas)** — que está num só lado — e, sem central, pela
+// parede (geocodificação inversa OSM/Nominatim). Ver `docs/03-modelo-dados.md`.
+// Tudo o que pertence à barragem (contorno, albufeira, central) segue este país.
+export const DAM_COUNTRY_OVERRIDES = {
+  "node/8380438013": "ES",     // O Caneiro
+  "way/165066319": "PT",       // (sem nome) — Montalegre
+  "way/374350504": "ES",       // (sem nome) — Rosal de la Frontera
+  "way/374350516": "ES",       // (sem nome) — Rosal de la Frontera
+  "way/374350526": "ES",       // (sem nome) — Rosal de la Frontera
+  "way/374350527": "ES",       // (sem nome) — Rosal de la Frontera
+  "way/374351382": "ES",       // (sem nome) — Rosal de la Frontera
+  "way/374355225": "PT",       // (sem nome) — Santo Aleixo da Restauração
+  "relation/10298722": "PT",   // Barragem do Abrilongo
+  "relation/2520396": "PT",    // Barragem de Picote
+  "way/207255601": "ES",       // Salto de Saucelle
+  "way/215669321": "ES",       // Salto de Aldeadávila
+  "way/53085066": "ES",        // Salto de Castro
+  "way/533091902": "PT",       // Barragem de Bemposta
+  "way/533221133": "ES",       // Presa da Frieira
+  "way/647259841": "ES",       // Presa del Arroyo de la Ribera
+  "way/71588050": "PT",        // Barragem de Miranda
+  "way/83809634": "ES",        // Central Hidroelétrica de Cedillo
+  "way/87078962": "ES",        // Barragem do Chança
+};
+
 // --- Ícone das barragens (Parte C) -----------------------------------
 export const DAM_ICON = {
   size: 32,          // px do ícone base

@@ -4,7 +4,7 @@
 
 import {
   LAYERS, USO_COLORS, USO_ORDER, PALETTE, CLUSTER, DAM_ICON, RELATED, HILLSHADE,
-  CONTOURS, CONFIANCA_COLORS, CONFIANCA_ORDER,
+  CONTOURS, CONFIANCA_COLORS, CONFIANCA_ORDER, DAM_COUNTRY_OVERRIDES,
 } from "./config.js";
 import { fetchJson, distanceM, distanceToGeometryM, pointOf, normalize } from "./utils.js";
 
@@ -40,7 +40,25 @@ const DAM_LAYERS = [
 const DAM_LAYER_KEYS = new Set(DAM_LAYERS.map(([k]) => k));
 
 // Infraestrutura auxiliar: segue só o país (não tem uso nem barragem associada).
-const COUNTRY_LAYERS = ["weirs-point", "substations-point", "power_lines-line", "conduits-line"];
+// Os POIs curados também seguem o país (têm `country`); não têm `uso`.
+const COUNTRY_LAYERS = ["weirs-point", "substations-point", "power_lines-line",
+                        "conduits-line", "pois-fill", "pois-line", "pois-label"];
+
+// Chave estável por camada, para remover as cópias PT/ES dos objectos de
+// fronteira (o mesmo objecto OSM aparece em `*_pt` e `*_es`). Ver
+// `docs/03-modelo-dados.md`.
+const DEDUPE_KEY = {
+  dam_geoms: (p) => p.dam_id,
+  reservoirs: (p) => p.reservoir_id,
+  plants: (p) => `${p.osm_type}/${p.osm_id}`,
+  submersos: (p) => p.id,
+  bairros: (p) => p.id,
+};
+
+// Camadas cujo `country` segue a barragem associada (a albufeira pertence ao
+// país da barragem). Os povoados curados **não** entram: o seu `pais` é um facto
+// próprio (há aldeias espanholas submersas por barragens de fronteira).
+const COUNTRY_FROM_DAM = new Set(["dam_geoms", "reservoirs", "plants"]);
 
 // ---------------------------------------------------------------------
 // Inicialização
@@ -324,9 +342,57 @@ async function loadLayerData(key) {
     if (fc?.features) features.push(...fc.features);
   }
 
-  if (key === "dams") { attachNotion(features); computeDamSizes(features); buildFidIndex(features); }
-  state.data[key] = features;
-  return { type: "FeatureCollection", features };
+  if (key === "dams") {
+    attachNotion(features);
+    const unicas = dedupeDams(features);
+    computeDamSizes(unicas);
+    buildFidIndex(unicas);
+    state.data[key] = unicas;
+    return { type: "FeatureCollection", features: unicas };
+  }
+
+  const unicas = dedupe(features, key);
+  state.data[key] = unicas;
+  return { type: "FeatureCollection", features: unicas };
+}
+
+/**
+ * Remove as cópias PT/ES dos objectos de fronteira, pela chave estável da
+ * camada (`DEDUPE_KEY`). As feições sem chave passam sempre.
+ */
+function dedupe(features, layerKey) {
+  const keyOf = DEDUPE_KEY[layerKey];
+  if (!keyOf) return features;
+  const vistos = new Set();
+  return features.filter((f) => {
+    const k = keyOf(f.properties || {});
+    if (!k) return true;
+    if (vistos.has(k)) return false;
+    vistos.add(k);
+    return true;
+  });
+}
+
+/**
+ * Barragens: uma por `dam_id`. Quando a barragem é de fronteira (existe em
+ * `dams_pt` e `dams_es`), mantém-se a cópia cujo país está em
+ * `DAM_COUNTRY_OVERRIDES` — assim o país da barragem é estável e coerente com
+ * o das suas albufeiras/contornos/centrais.
+ */
+function dedupeDams(features) {
+  const escolhida = new Map();
+  for (const f of features) {
+    const id = f.properties?.dam_id;
+    if (!id) continue;
+    const atual = escolhida.get(id);
+    if (!atual) { escolhida.set(id, f); continue; }
+    const quer = DAM_COUNTRY_OVERRIDES[id];
+    if (quer && f.properties.country === quer && atual.properties.country !== quer) {
+      escolhida.set(id, f);
+    }
+  }
+  const mantidas = new Set(escolhida.values());
+  return features.filter((f) => !f.properties?.dam_id || mantidas.has(f));
 }
 
 /**
@@ -400,7 +466,10 @@ function damIndex() {
  *
  * A ligação é por `dam_id` (contornos, albufeiras, povoados do Notion), pelos
  * `plant_ids` da barragem (centrais) ou pelo nome da barragem (povoados curados,
- * que só trazem `barragem`). O país das camadas curadas vem em `pais`.
+ * que só trazem `barragem`). O país das camadas curadas vem em `pais`; nas
+ * camadas que **pertencem** à barragem (`COUNTRY_FROM_DAM`) é o país da barragem
+ * que manda — é isso que mantém a albufeira e o contorno coerentes com o seu
+ * ponto depois de removidas as cópias de fronteira.
  *
  * Sem isto, as albufeiras e as centrais ignoravam por completo país/uso/Notion,
  * e o contorno das barragens desaparecia com o filtro «Só com página Notion».
@@ -413,7 +482,8 @@ function linkToDams(features, layerKey) {
     let dam = p.dam_id ? byId.get(p.dam_id) : null;
     if (!dam && layerKey === "plants") dam = byPlant.get(`${p.osm_type}/${p.osm_id}`);
     if (!dam && p.barragem) dam = byName.get(damKey(p.barragem));
-    if (!p.country && p.pais) p.country = p.pais;
+    if (dam && COUNTRY_FROM_DAM.has(layerKey) && dam.country) p.country = dam.country;
+    else if (!p.country && p.pais) p.country = p.pais;
     // Albufeira/central sem barragem associada fica sem uso conhecido, tal como
     // as barragens sem tags de uso.
     p.uso = dam?.uso || p.uso || "desconhecido";

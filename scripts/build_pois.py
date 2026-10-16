@@ -115,6 +115,7 @@ def build(offline: bool) -> list[dict]:
                 "name": poi.get("name"),
                 "kind": poi.get("kind") or "património",
                 "descricao": poi.get("descricao"),
+                "country": poi.get("country") or None,
                 "dam_id": poi.get("dam_id") or None,
                 "notion_url": poi.get("notion_url") or None,
                 "osm": ref,

@@ -122,15 +122,26 @@ recebe a combinação que lhe compete:
 | --- | --- | --- |
 | Barragens | `dams-points`, `dams-selected`, `dams-notion` | país + uso + Notion |
 | Pertencem a uma barragem (`DAM_LAYERS`) | `dam_geoms-line/-fill`, `reservoirs-fill/-outline`, `plants-point`, `submersos-point/-label`, `bairros-point/-label` | país + uso + Notion |
-| Infraestrutura auxiliar (`COUNTRY_LAYERS`) | `weirs-point`, `substations-point`, `power_lines-line`, `conduits-line` | só país |
+| Só país (`COUNTRY_LAYERS`) | `weirs-point`, `substations-point`, `power_lines-line`, `conduits-line`, `pois-fill/-line/-label` | só país |
 
 - **Ligação à barragem (`linkToDams`).** As feições das camadas do 2.º grupo não
 trazem por si os atributos que os filtros usam, logo recebem-nos da barragem
 associada: por `dam_id` (contornos, albufeiras, povoados do Notion), pelos
 `plant_ids` da barragem (**centrais**, que não têm `dam_id`) ou pelo **nome** da
-barragem (povoados curados, que só trazem `barragem`; também o `pais` sobe para
-`country`). O índice é `damIndex()` (por `dam_id`, por central e por nome) e é
-reconstruído só quando os dados das barragens mudam.
+barragem (povoados curados, que só trazem `barragem`). O índice é `damIndex()`
+(por `dam_id`, por central e por nome) e é reconstruído só quando os dados das
+barragens mudam.
+- **O país segue a barragem.** Nas camadas que *pertencem* à barragem
+  (`COUNTRY_FROM_DAM`: contorno, albufeira, central) o `country` é **substituído**
+  pelo da barragem. Os povoados curados **não** entram nesta regra: o seu `pais` é
+  um facto próprio e há aldeias espanholas submersas por barragens de fronteira
+  (sobe para `country` só quando falta).
+- **Duplicados de fronteira.** As barragens, contornos, albufeiras e centrais de
+  fronteira aparecem em `*_pt` e `*_es` (cada corrida Overpass carimba o seu país
+  no mesmo objecto). `dedupe`/`dedupeDams` (em `loadLayerData`) deixam **uma**
+  feição por chave estável (`dam_id`, `reservoir_id`, `tipo/id`); o país da
+  barragem duplicada vem de `DAM_COUNTRY_OVERRIDES` (`js/config.js`). Ver
+  [03 — Modelo de dados](03-modelo-dados.md#5-objectos-de-fronteira-duplicados).
 - **Ordem obrigatória — antes de criar a fonte.** O MapLibre gera as *tiles* de
   uma fonte GeoJSON **uma só vez**, quando o `data` é definido, e não volta a ver
   propriedades acrescentadas depois. Por isso `linkToDams` corre em

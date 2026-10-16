@@ -183,7 +183,32 @@ Os valores escritos na coluna `OSM` do Notion antes de 2026-10-16 podem ter a
 forma antiga (codificada). O resolvedor aceita as duas formas — ver
 `06-notion.md`.
 
-## 5. Tamanhos e orçamento
+## 5. Objectos de fronteira duplicados
+
+As barragens, os contornos, as albufeiras e as centrais que ficam **na
+fronteira** aparecem em `<camada>_pt.geojson` **e** em `<camada>_es.geojson`: cada
+corrida da Overpass cobre a área do seu país e carimba o seu `country` no mesmo
+objecto OSM. São objectos **idênticos excepto o país** (ao todo, 19 barragens, 19
+contornos, 29 albufeiras e 24 centrais).
+
+Com `country = all` viam-se duas vezes (marcadores e manchas sobrepostas). O
+frontend remove as cópias por chave estável (`dam_id`, `reservoir_id`, `tipo/id`)
+em `loadLayerData` e mantém, para cada barragem duplicada, o país indicado em
+`DAM_COUNTRY_OVERRIDES` (`js/config.js`). Tudo o que pertence à barragem segue
+esse país — a albufeira pertence ao país da barragem.
+
+O país de cada duplicado foi determinado pela localização da **central (casa de
+máquinas)**, que está num só lado da fronteira; sem central, pela parede
+(geocodificação inversa, OSM/Nominatim). Ficou: **PT** — Picote, Bemposta,
+Miranda, Abrilongo e 2 sem nome; **ES** — Saucelle, Aldeadávila, Salto de Castro,
+Cedillo, Frieira, Arroyo de la Ribera, Chança, O Caneiro e 5 sem nome.
+
+> Fora destes duplicados **não há nenhum desencontro**: 2028 albufeiras, 3580
+> contornos e 225 centrais têm o mesmo `country` da sua barragem. O ideal a prazo
+> é o pipeline resolver o país na origem (por ponto-no-país); até lá,
+> `DAM_COUNTRY_OVERRIDES` é a fonte de verdade.
+
+## 6. Tamanhos e orçamento
 
 - O objetivo é manter o carregamento inicial leve. As camadas são sempre
 escritas **por país** (`<camada>_<cc>.geojson`), o que já limita o tamanho de
@@ -197,7 +222,7 @@ as menos usadas ficam desligadas por defeito.
 - O `PROMPT_DEEPSEEK_v2.md` descreve um plano **condicional** para converter
   camadas pesadas em PMTiles se excederem o orçamento.
 
-## 6. Aviso de dados de amostra
+## 7. Aviso de dados de amostra
 
 Se `manifest.sample` for `true` (ou `sample_countries` não vazio), o site
 mostra um **aviso amarelo** e explica que são dados de amostra. O campo

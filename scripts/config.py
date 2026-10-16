@@ -157,6 +157,7 @@ POIS = [
         "name": "Pousada de Picote",
         "kind": "pousada",
         "descricao": "Antiga casa da guarda da barragem de Picote, hoje Pousada (hotel) — património ligado à construção das grandes barragens do Douro.",
+        "country": "PT",
         "dam_id": "",
         "notion_url": "",
     },

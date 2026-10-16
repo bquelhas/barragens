@@ -143,6 +143,9 @@ A configuração está centralizada em dois ficheiros que se **espelham**:
 
 | Nome | Descrição |
 | --- | --- |
+| `DAM_COUNTRY_OVERRIDES` | País (PT/ES) das 19 barragens de fronteira duplicadas, por `dam_id`. O frontend remove as cópias e mantém este país. Ver [03 — Modelo de dados](03-modelo-dados.md#5-objectos-de-fronteira-duplicados) |
+| `CONTOURS` | Curvas de nível (`maplibre-contour`): limiares por zoom, cores, rótulos |
+| `HILLSHADE` | Relevo sombreado (desligado por omissão) |
 | `DAM_ICON` | `size` (px), `minSize`, `maxSize` — dimensionamento do ícone |
 | `RELATED` | `line` (300 m), `sub` (400 m), `dim` (0.16) — destaque da rede |
 | `HILLSHADE` | `enabled` (`false`), `tiles`, `encoding`, `tileSize`, `maxzoom`, `exaggeration`, `attribution` |
