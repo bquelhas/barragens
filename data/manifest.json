@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T11:19:35+00:00",
+  "generated_at": "2026-10-19T09:52:12+00:00",
   "sample": false,
   "sample_countries": [],
   "source": "OpenStreetMap (extract Geofabrik .osm.pbf)",
@@ -90,5 +90,5 @@
     }
   },
   "total_features": 34932,
-  "notion_count": 32
+  "notion_count": 50
 }
