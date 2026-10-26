@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-19T09:52:12+00:00",
+  "generated_at": "2026-10-26T10:05:29+00:00",
   "sample": false,
   "sample_countries": [],
   "source": "OpenStreetMap (extract Geofabrik .osm.pbf)",
@@ -12,8 +12,8 @@
   "counts": {
     "dams": 3618,
     "dam_geoms": 3618,
-    "reservoirs": 3164,
-    "weirs": 6511,
+    "reservoirs": 3165,
+    "weirs": 6513,
     "plants": 424,
     "substations": 282,
     "power_lines": 8099,
@@ -81,14 +81,14 @@
     "PT": {
       "dams": 781,
       "dam_geoms": 781,
-      "reservoirs": 1277,
-      "weirs": 2377,
+      "reservoirs": 1278,
+      "weirs": 2379,
       "plants": 229,
       "substations": 192,
       "power_lines": 1852,
       "conduits": 2852
     }
   },
-  "total_features": 34932,
+  "total_features": 34935,
   "notion_count": 50
 }
