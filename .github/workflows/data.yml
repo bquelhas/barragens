@@ -18,7 +18,7 @@ on:
       countries:
         description: "Países a extrair (separados por vírgula)"
         required: false
-        default: "PT,ES"
+        default: "PT"
 
 # Evita duas execuções em simultâneo.
 concurrency:
@@ -58,7 +58,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           COUNTRIES="${{ github.event.inputs.countries }}"
-          if [ -z "$COUNTRIES" ]; then COUNTRIES="PT,ES"; fi
+          if [ -z "$COUNTRIES" ]; then COUNTRIES="PT"; fi
 
           IFS=',' read -ra CC_LIST <<< "$COUNTRIES"
           for cc in "${CC_LIST[@]}"; do

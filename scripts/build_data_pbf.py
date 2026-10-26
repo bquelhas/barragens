@@ -329,7 +329,7 @@ def run(countries, skip_infra, force):
 
 def main():
     p = argparse.ArgumentParser(description="Gera dados a partir de extracts PBF.")
-    p.add_argument("--countries", default="PT,ES")
+    p.add_argument("--countries", default="PT")
     p.add_argument("--skip-infra", action="store_true")
     p.add_argument("--force", action="store_true")
     args = p.parse_args()
