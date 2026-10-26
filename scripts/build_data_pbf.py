@@ -81,7 +81,7 @@ def matches(layer: str, t: dict) -> bool:
 
 
 def _coords(ring) -> list:
-    return [(nd.location.lon, nd.location.lat) for nd in ring]
+    return [(nd.location.lon, nd.location.lat) for nd in ring if nd.location.valid()]
 
 
 def _rings_to_polygon(area):
@@ -147,7 +147,9 @@ class Extractor(osmium.SimpleHandler):
         closed = w.is_closed()
         for layer in ("dams", "weirs", "power_lines", "conduits"):
             if layer in self.layers and matches(layer, t):
-                coords = [(nd.lon, nd.lat) for nd in w.nodes]
+                # Malhas que atravessam a fronteira do extract referem nós que
+                # não estão no ficheiro (localização inválida): ignorá-los.
+                coords = [(nd.lon, nd.lat) for nd in w.nodes if nd.location.valid()]
                 if len(coords) < 2:
                     continue
                 geom = Polygon(coords) if (closed and len(coords) >= 4) else LineString(coords)
